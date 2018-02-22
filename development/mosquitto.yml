@@ -1,0 +1,55 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mosquitto
+  labels:
+    app: mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      volumes:
+      - name: nfs-config
+        nfs:
+          server: storage.zhc.x64.me
+          path: /mnt/datacenter_250GB/kubernetes/development/mosquitto/config
+      - name: nfs-data
+        nfs:
+          server: storage.zhc.x64.me
+          path: /mnt/datacenter_250GB/kubernetes/development/mosquitto/data
+      containers:
+      - name: mosquitto
+        image: eclipse-mosquitto:1.4.12
+        volumeMounts:
+        - name: nfs-config
+          mountPath: /mosquitto/config
+        - name: nfs-data
+          mountPath: /mosquitto/data
+        ports:
+        - containerPort: 1883
+        ports:
+        - containerPort: 9001
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mosquitto-service
+spec:
+  selector:
+    app: mosquitto
+  ports:
+  - name: unencrypted
+    protocol: TCP
+    port: 1883
+    targetPort: 1883
+  - name: websocket
+    protocol: TCP
+    port: 9001
+    targetPort: 9001
+  type: LoadBalancer

@@ -1,0 +1,43 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: home-assistant
+  labels:
+    app: home-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: home-assistant
+  template:
+    metadata:
+      labels:
+        app: home-assistant
+    spec:
+      volumes:
+      - name: nfs-volume
+        nfs:
+          server: storage.zhc.x64.me
+          path: /mnt/datacenter_250GB/kubernetes/development/home-assistant
+      containers:
+      - name: home-assistant
+        image: homeassistant/home-assistant:0.63.3
+        volumeMounts:
+        - name: nfs-volume
+          mountPath: /config
+        ports:
+        - containerPort: 8123
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-assistant-service
+spec:
+  selector:
+    app: home-assistant
+  ports:
+  - name: web-interface
+    protocol: TCP
+    port: 8123
+    targetPort: 8123
+  type: LoadBalancer

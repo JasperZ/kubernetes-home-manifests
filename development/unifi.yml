@@ -1,0 +1,65 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: unifi
+  labels:
+    app: unifi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unifi
+  template:
+    metadata:
+      labels:
+        app: unifi
+    spec:
+      volumes:
+      - name: unifi
+        nfs:
+          server: storage.zhc.x64.me
+          path: "/mnt/datacenter_250GB/kubernetes/development/unifi"
+      containers:
+      - name: unifi
+        image: jacobalberty/unifi:5.7.19-sc-3ca0b231
+        env:
+        - name: TZ
+          value: Europe/Berlin
+        volumeMounts:
+        - name: unifi
+          mountPath: /unifi
+        ports:
+        - containerPort: 8080
+        - containerPort: 8443
+        - containerPort: 8880
+        - containerPort: 6789
+        - containerPort: 3478
+          protocol: UDP
+        - containerPort: 10001
+          protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unifi-service
+spec:
+  selector:
+    app: unifi
+  ports:
+  - name: device-command
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  - name: web-interface
+    protocol: TCP
+    port: 8443
+    targetPort: 8443
+  - name: http-portal
+    protocol: TCP
+    port: 8880
+    targetPort: 8880
+  - name: speed-test
+    protocol: TCP
+    port: 6789
+    targetPort: 6789
+  type: LoadBalancer

@@ -1,0 +1,37 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: collabora
+  labels:
+    app: collabora
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: collabora
+  template:
+    metadata:
+      labels:
+        app: collabora
+    spec:
+      containers:
+      - name: home-assistant
+        image: collabora/code:3.0.0.5
+        env:
+        - name: domain
+          value: "nextcloud\\.jz-c\\.org"
+        ports:
+        - containerPort: 9980
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collabora-service
+spec:
+  selector:
+    app: collabora
+  ports:
+  - protocol: TCP
+    port: 9980
+    targetPort: 9980
+  type: LoadBalancer

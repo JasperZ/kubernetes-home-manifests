@@ -1,32 +1,37 @@
---- 
+---
 apiVersion: apps/v1beta1
 kind: Deployment
-metadata: 
-  labels: 
+metadata:
+  labels:
     app: nextcloud
   name: nextcloud
-spec: 
+spec:
   replicas: 1
-  selector: 
-    matchLabels: 
+  selector:
+    matchLabels:
       app: nextcloud
-  template: 
-    metadata: 
-      labels: 
+  template:
+    metadata:
+      labels:
         app: nextcloud
-    spec: 
-      containers: 
-        - image: "nextcloud:12.0.1-apache"
+    spec:
+      containers:
+        - image: "linuxserver/nextcloud:112"
           name: nextcloud
-          ports: 
-            - containerPort: 80
-          volumeMounts: 
-            - mountPath: /var/www/html
+          ports:
+            - containerPort: 443
+          volumeMounts:
+            - mountPath: /data
               name: nextcloud-data-volume
-      volumes: 
+            - mountPath: /config
+              name: nextcloud-config-volume
+      volumes:
         - name: nextcloud-data-volume
-          persistentVolumeClaim: 
-            claimName: nextcloud-pvc
+          persistentVolumeClaim:
+            claimName: nextcloud-data-pvc
+        - name: nextcloud-config-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-config-pvc
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -46,7 +51,7 @@ spec:
     spec:
       containers:
         - name: nextcloud-mariadb
-          image: mariadb:10.3.4
+          image: mariadb:10.3
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: 01928375jk1h5125
@@ -55,40 +60,69 @@ spec:
               mountPath: /var/lib/mysql
           ports:
             - containerPort: 3306
-      volumes: 
+      volumes:
         - name: mariadb-data-volume
-          persistentVolumeClaim: 
+          persistentVolumeClaim:
             claimName: nextcloud-mariadb-pvc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-pvc
+  name: nextcloud-data-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   volumeMode: Filesystem
   resources:
     requests:
       storage: 5Gi
-  volumeName: nextcloud-pv
+  volumeName: nextcloud-data-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-config-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: nextcloud-config-pv
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nextcloud-pv
+  name: nextcloud-data-pv
 spec:
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Recycle
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
   mountOptions:
-    - hard
     - nfsvers=3
   nfs:
     path: /mnt/datacenter_250GB/kubernetes/development/nextcloud/data
+    server: storage.zhc.x64.me
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-config-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/nextcloud/config
     server: storage.zhc.x64.me
 ---
 apiVersion: v1
@@ -116,7 +150,6 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
   mountOptions:
-    - hard
     - nfsvers=3
   nfs:
     path: /mnt/datacenter_250GB/kubernetes/development/nextcloud/mariadb
@@ -131,8 +164,8 @@ spec:
     app: nextcloud
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 80
+      port: 443
+      targetPort: 443
   type: LoadBalancer
 ---
 apiVersion: v1

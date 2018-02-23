@@ -129,9 +129,14 @@ spec:
   selector:
     app: gogs
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 3000
+    - name: ssh
+      protocol: TCP
+      port: 22
+      targetPort: 22
   type: LoadBalancer
 ---
 apiVersion: v1

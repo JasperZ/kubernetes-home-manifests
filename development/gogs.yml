@@ -1,0 +1,147 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: gogs
+  name: gogs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gogs
+  template:
+    metadata:
+      labels:
+        app: gogs
+    spec:
+      containers:
+        - image: "gogs/gogs:0.11.34"
+          name: nextcloud
+          ports:
+            - containerPort: 22
+            - containerPort: 3000
+          volumeMounts:
+            - mountPath: /data
+              name: gogs-data-volume
+      volumes:
+        - name: gogs-data-volume
+          persistentVolumeClaim:
+            claimName: gogs-data-pvc
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: gogs-mariadb
+  labels:
+    app: gogs-mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gogs-mariadb
+  template:
+    metadata:
+      labels:
+        app: gogs-mariadb
+    spec:
+      containers:
+        - name: gogs-mariadb
+          image: mariadb:10.3
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: jk7h54kl5j7h34kl75jh
+          volumeMounts:
+            - name: mariadb-data-volume
+              mountPath: /var/lib/mysql
+          ports:
+            - containerPort: 3306
+      volumes:
+        - name: mariadb-data-volume
+          persistentVolumeClaim:
+            claimName: gogs-mariadb-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gogs-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: gogs-data-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gogs-data-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/gogs/data
+    server: storage.zhc.x64.me
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gogs-mariadb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: gogs-mariadb-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gogs-mariadb-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/gogs/mariadb
+    server: storage.zhc.x64.me
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gogs-service
+spec:
+  selector:
+    app: gogs
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gogs-mariadb-service
+spec:
+  selector:
+    app: gogs-mariadb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

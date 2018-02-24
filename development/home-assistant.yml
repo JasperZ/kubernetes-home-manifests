@@ -41,3 +41,4 @@ spec:
     port: 8123
     targetPort: 8123
   type: LoadBalancer
+  loadBalancerIP: 192.168.1.240

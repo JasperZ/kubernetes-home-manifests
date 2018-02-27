@@ -21,7 +21,7 @@ spec:
           path: /mnt/datacenter_250GB/kubernetes/development/home-assistant
       containers:
       - name: home-assistant
-        image: homeassistant/home-assistant:0.63.3
+        image: homeassistant/home-assistant:0.64.0
         volumeMounts:
         - name: nfs-volume
           mountPath: /config

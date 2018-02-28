@@ -1,0 +1,121 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: urbackup
+  name: urbackup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: urbackup
+  template:
+    metadata:
+      labels:
+        app: urbackup
+    spec:
+      containers:
+        - image: uroni/urbackup-server:latest
+          name: urbackup
+          ports:
+            - containerPort: 55413
+            - containerPort: 55414
+            - containerPort: 55415
+            - containerPort: 35623
+              protocol: UDP
+          volumeMounts:
+            - mountPath: /backups
+              name: urbackup-backups-volume
+            - mountPath: /var/urbackup
+              name: urbackup-database-volume
+      volumes:
+        - name: urbackup-backups-volume
+          persistentVolumeClaim:
+            claimName: urbackup-backups-pvc
+        - name: urbackup-database-volume
+          persistentVolumeClaim:
+            claimName: urbackup-database-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: urbackup-backups-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: urbackup-backups-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: urbackup-backups-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/backups
+    server: storage.zhc.x64.me
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: urbackup-database-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: urbackup-database-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: urbackup-database-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/database
+    server: storage.zhc.x64.me
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: urbackup-service
+spec:
+  selector:
+    app: urbackup
+  ports:
+    - name: fast-cgi
+      protocol: TCP
+      port: 55413
+      targetPort: 55413
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 55414
+    - name: internet-clients
+      protocol: TCP
+      port: 55415
+      targetPort: 55415
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.248

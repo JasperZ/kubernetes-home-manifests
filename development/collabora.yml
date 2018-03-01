@@ -1,3 +1,20 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: collabora-service
+spec:
+  selector:
+    app: collabora
+  ports:
+  - protocol: TCP
+    port: 9980
+    targetPort: 9980
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.242
+---
+
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -22,17 +39,3 @@ spec:
           value: "nextcloud\\.jz-c\\.org"
         ports:
         - containerPort: 9980
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: collabora-service
-spec:
-  selector:
-    app: collabora
-  ports:
-  - protocol: TCP
-    port: 9980
-    targetPort: 9980
-  type: LoadBalancer
-  loadBalancerIP: 192.168.1.242

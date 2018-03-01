@@ -1,3 +1,62 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: urbackup-backups-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/backups
+    server: storage.zhc.x64.me
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: urbackup-database-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/database
+    server: storage.zhc.x64.me
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: urbackup-backups-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: urbackup-backups-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: urbackup-database-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: urbackup-database-pv
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -36,66 +95,6 @@ spec:
         - name: urbackup-database-volume
           persistentVolumeClaim:
             claimName: urbackup-database-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: urbackup-backups-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5Gi
-  volumeName: urbackup-backups-pv
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: urbackup-backups-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-    - nfsvers=3
-  nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/backups
-    server: storage.zhc.x64.me
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: urbackup-database-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5Gi
-  volumeName: urbackup-database-pv
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: urbackup-database-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-    - nfsvers=3
-  nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/database
-    server: storage.zhc.x64.me
 ---
 apiVersion: v1
 kind: Service

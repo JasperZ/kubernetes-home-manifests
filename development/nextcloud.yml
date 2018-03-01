@@ -1,37 +1,249 @@
 ---
-apiVersion: apps/v1beta1
-kind: Deployment
+
+apiVersion: v1
+kind: PersistentVolume
 metadata:
-  labels:
-    app: nextcloud
-  name: nextcloud
+  name: nextcloud-mariadb-data-pv
 spec:
-  replicas: 1
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/mariadb/data
+    server: storage.zhc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-elasticsearch-data-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/elasticsearch/data
+    server: storage.zhc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-elasticsearch-plugins-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/elasticsearch/plugins
+    server: storage.zhc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-redis-data-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/redis/data
+    server: storage.zhc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-config-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/config
+    server: storage.zhc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-data-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/data
+    server: storage.zhc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-mariadb-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: nextcloud-mariadb-data-pv
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-elasticsearch-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: nextcloud-elasticsearch-data-pv
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-elasticsearch-plugins-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: nextcloud-elasticsearch-plugins-pv
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-redis-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: nextcloud-redis-data-pv
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: nextcloud-config-pv
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: nextcloud-data-pv
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-mariadb-service
+spec:
   selector:
-    matchLabels:
-      app: nextcloud
-  template:
-    metadata:
-      labels:
-        app: nextcloud
-    spec:
-      containers:
-        - image: "linuxserver/nextcloud:112"
-          name: nextcloud
-          ports:
-            - containerPort: 443
-          volumeMounts:
-            - mountPath: /data
-              name: nextcloud-data-volume
-            - mountPath: /config
-              name: nextcloud-config-volume
-      volumes:
-        - name: nextcloud-data-volume
-          persistentVolumeClaim:
-            claimName: nextcloud-data-pvc
-        - name: nextcloud-config-volume
-          persistentVolumeClaim:
-            claimName: nextcloud-config-pvc
+    app: nextcloud-mariadb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-elasticsearch-service
+spec:
+  selector:
+    app: nextcloud-elasticsearch
+  ports:
+    - protocol: TCP
+      port: 9200
+      targetPort: 9200
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-redis-service
+spec:
+  selector:
+    app: nextcloud-redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-service
+spec:
+  selector:
+    app: nextcloud
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 443
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.244
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -49,22 +261,29 @@ spec:
       labels:
         app: nextcloud-mariadb
     spec:
+      volumes:
+        - name: nextcloud-mariadb-data-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-mariadb-data-pvc
       containers:
         - name: nextcloud-mariadb
-          image: mariadb:10.3
+          image: mariadb:10.3.5
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: 01928375jk1h5125
+            - name: MYSQL_DATABASE
+              value: nextcloud
+            - name: MYSQL_USER
+              value: nextcloud
+            - name: MYSQL_PASSWORD
+              value: ß1046ß23863205671
           volumeMounts:
-            - name: mariadb-data-volume
+            - name: nextcloud-mariadb-data-volume
               mountPath: /var/lib/mysql
           ports:
             - containerPort: 3306
-      volumes:
-        - name: mariadb-data-volume
-          persistentVolumeClaim:
-            claimName: nextcloud-mariadb-pvc
 ---
+
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -81,6 +300,13 @@ spec:
       labels:
         app: nextcloud-elasticsearch
     spec:
+      volumes:
+        - name: nextcloud-elasticsearch-data-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-elasticsearch-data-pvc
+        - name: nextcloud-elasticsearch-plugins-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-elasticsearch-plugins-pvc
       containers:
         - name: nextcloud-elasticsearch
           image: elasticsearch:5.6.8
@@ -95,198 +321,68 @@ spec:
           ports:
             - containerPort: 9200
             - containerPort: 9300
-      volumes:
-        - name: nextcloud-elasticsearch-data-volume
-          persistentVolumeClaim:
-            claimName: nextcloud-elasticsearch-data-pvc
-        - name: nextcloud-elasticsearch-plugins-volume
-          persistentVolumeClaim:
-            claimName: nextcloud-elasticsearch-plugins-pvc
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
+
+apiVersion: apps/v1beta1
+kind: Deployment
 metadata:
-  name: nextcloud-data-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5Gi
-  volumeName: nextcloud-data-pv
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nextcloud-config-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5Gi
-  volumeName: nextcloud-config-pv
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-data-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-    - nfsvers=3
-  nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/nextcloud/data
-    server: storage.zhc.x64.me
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-config-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-    - nfsvers=3
-  nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/nextcloud/config
-    server: storage.zhc.x64.me
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nextcloud-mariadb-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5Gi
-  volumeName: nextcloud-mariadb-pv
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-mariadb-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-    - nfsvers=3
-  nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/nextcloud/mariadb
-    server: storage.zhc.x64.me
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nextcloud-elasticsearch-data-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5Gi
-  volumeName: nextcloud-elasticsearch-data-pv
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nextcloud-elasticsearch-plugins-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5Gi
-  volumeName: nextcloud-elasticsearch-plugins-pv
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-elasticsearch-data-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-    - nfsvers=3
-  nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/nextcloud/elasticsearch/data
-    server: storage.zhc.x64.me
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nextcloud-elasticsearch-plugins-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-    - nfsvers=3
-  nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/nextcloud/elasticsearch/plugins
-    server: storage.zhc.x64.me
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nextcloud-service
-spec:
-  selector:
+  labels:
     app: nextcloud
-  ports:
-    - protocol: TCP
-      port: 443
-      targetPort: 443
-  type: LoadBalancer
-  loadBalancerIP: 192.168.1.244
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nextcloud-mariadb-service
+  name: nextcloud
 spec:
+  replicas: 1
   selector:
-    app: nextcloud-mariadb
-  ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      volumes:
+        - name: nextcloud-config-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-config-pvc
+        - name: nextcloud-data-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-data-pvc
+      containers:
+        - image: linuxserver/nextcloud:113
+          name: nextcloud
+          volumeMounts:
+            - mountPath: /config
+              name: nextcloud-config-volume
+            - mountPath: /data
+              name: nextcloud-data-volume
+          ports:
+            - containerPort: 443
 ---
-apiVersion: v1
-kind: Service
+
+apiVersion: apps/v1beta1
+kind: Deployment
 metadata:
-  name: nextcloud-elasticsearch-service
+  labels:
+    app: nextcloud-redis
+  name: nextcloud-redis
 spec:
+  replicas: 1
   selector:
-    app: nextcloud-elasticsearch
-  ports:
-    - protocol: TCP
-      port: 9200
-      targetPort: 9200
+    matchLabels:
+      app: nextcloud-redis
+  template:
+    metadata:
+      labels:
+        app: nextcloud-redis
+    spec:
+      volumes:
+        - name: nextcloud-redis-data-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-redis-data-pvc
+      containers:
+        - image: redis:4.0.8-alpine
+          name: nextcloud-redis
+          volumeMounts:
+            - mountPath: /data
+              name: nextcloud-redis-data-volume
+          ports:
+            - containerPort: 6379

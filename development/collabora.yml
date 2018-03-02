@@ -36,6 +36,6 @@ spec:
         image: collabora/code:3.0.0.5
         env:
         - name: domain
-          value: "nextcloud\\.jz-c\\.org"
+          value: "nextcloud\\.jz-c\\.org|test\\.jz-c\\.org"
         ports:
         - containerPort: 9980

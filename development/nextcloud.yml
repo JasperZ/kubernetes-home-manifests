@@ -104,7 +104,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/data
+    path: /mnt/datacenter_1tb/kubernetes/production/persistent_volumes_manual/nextcloud/data
     server: storage.zhc.x64.me
 ---
 
@@ -245,6 +245,7 @@ spec:
   type: LoadBalancer
   loadBalancerIP: 192.168.1.244
 ---
+
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:

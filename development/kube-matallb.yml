@@ -1,10 +1,13 @@
-## Namespace
+---
+# Source: metallb/templates/namespace.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
   name: metallb-system
+
 ---
-## RBAC roles
+# Source: metallb/templates/rbac.yaml
+# Roles
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -26,7 +29,7 @@ metadata:
   name: metallb-system:speaker
 rules:
 - apiGroups: [""]
-  resources: ["services", "endpoints"]
+  resources: ["services", "endpoints", "nodes"]
   verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -52,9 +55,7 @@ rules:
 - apiGroups: [""]
   resources: ["configmaps"]
   verbs: ["get", "list", "watch"]
-- # Allow creating events in the metallb-system namespace
-  # so that watchers can post config errors.
-  apiGroups: [""]
+- apiGroups: [""]
   resources: ["events"]
   verbs: ["create"]
 ---
@@ -128,15 +129,15 @@ roleRef:
   kind: Role
   name: leader-election
 ---
-
-## Controller deployment
+# Source: metallb/templates/controller.yaml
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   namespace: metallb-system
   name: controller
   labels:
-    app: controller
+    app: metallb
+    component: controller
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "7472"
@@ -144,11 +145,13 @@ spec:
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: controller
+      app: metallb
+      component: controller
   template:
     metadata:
       labels:
-        app: controller
+        app: metallb
+        component: controller
     spec:
       serviceAccountName: controller
       terminationGracePeriodSeconds: 0
@@ -157,7 +160,8 @@ spec:
         runAsUser: 65534 # nobody
       containers:
       - name: controller
-        image: metallb/controller:v0.3.1
+        image: metallb/controller:v0.4.2
+        imagePullPolicy: IfNotPresent
         args:
         - --port=7472
         ports:
@@ -165,32 +169,36 @@ spec:
           containerPort: 7472
         resources:
           limits:
-            cpu: "0.1"
-            memory: "100Mi"
+            cpu: 100m
+            memory: 100Mi
+
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
             - all
           readOnlyRootFilesystem: true
----
 
-# Speaker DaemonSet
+---
+# Source: metallb/templates/speaker.yaml
 apiVersion: apps/v1beta2
 kind: DaemonSet
 metadata:
   namespace: metallb-system
   name: speaker
   labels:
-    app: speaker
+    app: metallb
+    component: speaker
 spec:
   selector:
     matchLabels:
-      app: speaker
+      app: metallb
+      component: speaker
   template:
     metadata:
       labels:
-        app: speaker
+        app: metallb
+        component: speaker
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "7472"
@@ -200,7 +208,8 @@ spec:
       hostNetwork: true
       containers:
       - name: speaker
-        image: metallb/speaker:v0.3.1
+        image: metallb/speaker:v0.4.2
+        imagePullPolicy: IfNotPresent
         args:
         - --port=7472
         env:
@@ -217,8 +226,9 @@ spec:
           containerPort: 7472
         resources:
           limits:
-            cpu: "0.1"
-            memory: "100Mi"
+            cpu: 100m
+            memory: 100Mi
+
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
@@ -228,6 +238,7 @@ spec:
             add:
             - net_raw
 ---
+
 apiVersion: v1
 kind: ConfigMap
 metadata:

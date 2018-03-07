@@ -1,0 +1,28 @@
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web-ui
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: nextcloud.jz-c.org
+    http:
+      paths:
+      - backend:
+          serviceName: nextcloud-service
+          servicePort: 443
+  - host: office.jz-c.org
+    http:
+      paths:
+      - backend:
+          serviceName: collabora-service
+          servicePort: 443
+  - host: git.jz-c.org
+    http:
+      paths:
+      - backend:
+          serviceName: gogs-service
+          servicePort: 80

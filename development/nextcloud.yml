@@ -239,11 +239,10 @@ spec:
   selector:
     app: nextcloud
   ports:
-    - protocol: TCP
+    - name: https
+      protocol: TCP
       port: 443
       targetPort: 443
-  type: LoadBalancer
-  loadBalancerIP: 192.168.1.244
 ---
 
 apiVersion: apps/v1beta1

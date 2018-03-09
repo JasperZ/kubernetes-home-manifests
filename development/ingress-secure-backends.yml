@@ -47,6 +47,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/secure-backends: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "16G"
 spec:
   tls:
   - hosts:

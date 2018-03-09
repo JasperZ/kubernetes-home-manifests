@@ -1,0 +1,23 @@
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-insecure-backends
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/issuer: "letsencrypt-production-issuer"
+    certmanager.k8s.io/acme-challenge-type: "http01"
+spec:
+  tls:
+  - hosts:
+    - git.jz-c.org
+    secretName: git.jz-c.org-production-cert
+  rules:
+  - host: git.jz-c.org
+    http:
+      paths:
+      - backend:
+          serviceName: gogs-service
+          servicePort: 80

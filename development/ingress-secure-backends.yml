@@ -1,0 +1,33 @@
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-secure-backends
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/secure-backends: "true"
+    certmanager.k8s.io/issuer: "letsencrypt-staging-issuer"
+    certmanager.k8s.io/acme-challenge-type: "http01"
+spec:
+  tls:
+  - hosts:
+    - nextcloud.jz-c.org
+    secretName: nextcloud.jz-c.org-staging-cert
+  - hosts:
+    - office.jz-c.org
+    secretName: office.jz-c.org-staging-cert
+  rules:
+  - host: nextcloud.jz-c.org
+    http:
+      paths:
+      - backend:
+          serviceName: nextcloud-service
+          servicePort: 443
+  - host: office.jz-c.org
+    http:
+      paths:
+      - backend:
+          serviceName: collabora-service
+          servicePort: 443

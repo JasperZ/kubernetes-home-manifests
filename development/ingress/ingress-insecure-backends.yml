@@ -19,3 +19,24 @@ spec:
       - backend:
           serviceName: gogs-service
           servicePort: 80
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mqtt-jz-c-org
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.org/websocket-services: "home-assistant-mosquitto-service"
+spec:
+  tls:
+  - hosts:
+    - mqtt.jz-c.org
+    secretName: mqtt.jz-c.org-tls
+  rules:
+  - host: mqtt.jz-c.org
+    http:
+      paths:
+      - backend:
+          serviceName: home-assistant-mosquitto-service
+          servicePort: 8883

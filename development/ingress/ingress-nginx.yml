@@ -262,6 +262,8 @@ spec:
             containerPort: 80
           - name: https
             containerPort: 443
+          - name: prom-metrics
+            containerPort: 10254
           - name: nginx-status
             containerPort: 18080
           livenessProbe:
@@ -300,6 +302,10 @@ spec:
   - name: https
     port: 443
     targetPort: 443
+    protocol: TCP
+  - name: prometheus-metrics
+    port: 10254
+    targetPort: 10254
     protocol: TCP
   - name: nginx-status
     port: 18080

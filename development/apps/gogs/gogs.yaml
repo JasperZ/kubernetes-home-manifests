@@ -3,24 +3,6 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: gogs-mariadb-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  mountOptions:
-    - nfsvers=3
-  nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/gogs/mariadb
-    server: storage.zhc.x64.me
----
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
   name: gogs-data-pv
 spec:
   capacity:
@@ -39,20 +21,6 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: gogs-mariadb-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 5Gi
-  volumeName: gogs-mariadb-pv
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: gogs-data-pvc
 spec:
   accessModes:
@@ -62,19 +30,6 @@ spec:
     requests:
       storage: 5Gi
   volumeName: gogs-data-pv
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: gogs-mariadb-service
-spec:
-  selector:
-    app: gogs-mariadb
-  ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
 ---
 
 apiVersion: v1
@@ -95,39 +50,6 @@ spec:
       targetPort: 22
   type: LoadBalancer
   loadBalancerIP: 192.168.1.245
----
-
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: gogs-mariadb
-  labels:
-    app: gogs-mariadb
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: gogs-mariadb
-  template:
-    metadata:
-      labels:
-        app: gogs-mariadb
-    spec:
-      containers:
-        - name: gogs-mariadb
-          image: mariadb:10.3
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: jk7h54kl5j7h34kl75jh
-          volumeMounts:
-            - name: mariadb-data-volume
-              mountPath: /var/lib/mysql
-          ports:
-            - containerPort: 3306
-      volumes:
-        - name: mariadb-data-volume
-          persistentVolumeClaim:
-            claimName: gogs-mariadb-pvc
 ---
 
 apiVersion: apps/v1beta1

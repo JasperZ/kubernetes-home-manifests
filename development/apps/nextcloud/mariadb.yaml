@@ -1,0 +1,84 @@
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextcloud-mariadb-data-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/mariadb/data
+    server: storage.zhc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-mariadb-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: nextcloud-mariadb-data-pv
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-mariadb-service
+spec:
+  selector:
+    app: nextcloud-mariadb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nextcloud-mariadb
+  labels:
+    app: nextcloud-mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextcloud-mariadb
+  template:
+    metadata:
+      labels:
+        app: nextcloud-mariadb
+    spec:
+      volumes:
+        - name: nextcloud-mariadb-data-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-mariadb-data-pvc
+      containers:
+        - name: nextcloud-mariadb
+          image: mariadb:10.3.5
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: 01928375jk1h5125
+            - name: MYSQL_DATABASE
+              value: nextcloud
+            - name: MYSQL_USER
+              value: nextcloud
+            - name: MYSQL_PASSWORD
+              value: ß1046ß23863205671
+          volumeMounts:
+            - name: nextcloud-mariadb-data-volume
+              mountPath: /var/lib/mysql
+          ports:
+            - containerPort: 3306

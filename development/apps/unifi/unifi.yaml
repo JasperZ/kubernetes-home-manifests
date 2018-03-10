@@ -15,6 +15,7 @@ spec:
     path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/unifi/config
     server: storage.zhc.x64.me
 ---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -27,6 +28,35 @@ spec:
     requests:
       storage: 5Gi
   volumeName: unifi-config-pv
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: unifi-service
+spec:
+  selector:
+    app: unifi
+  ports:
+  - name: device-command
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  - name: web-interface
+    protocol: TCP
+    port: 8443
+    targetPort: 8443
+  - name: http-portal
+    protocol: TCP
+    port: 8880
+    targetPort: 8880
+  - name: speed-test
+    protocol: TCP
+    port: 6789
+    targetPort: 6789
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.243
+
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -66,30 +96,3 @@ spec:
           protocol: UDP
         - containerPort: 10001
           protocol: UDP
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: unifi-service
-spec:
-  selector:
-    app: unifi
-  ports:
-  - name: device-command
-    protocol: TCP
-    port: 8080
-    targetPort: 8080
-  - name: web-interface
-    protocol: TCP
-    port: 8443
-    targetPort: 8443
-  - name: http-portal
-    protocol: TCP
-    port: 8880
-    targetPort: 8880
-  - name: speed-test
-    protocol: TCP
-    port: 6789
-    targetPort: 6789
-  type: LoadBalancer
-  loadBalancerIP: 192.168.1.243

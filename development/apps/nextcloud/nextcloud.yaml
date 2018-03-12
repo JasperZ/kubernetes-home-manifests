@@ -3,18 +3,18 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nextcloud-config-pv
+  name: nextcloud-html-pv
 spec:
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/config
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/html
     server: storage.zhc.x64.me
 ---
 
@@ -27,7 +27,7 @@ spec:
     storage: 5Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - nfsvers=3
@@ -39,15 +39,15 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-config-pvc
+  name: nextcloud-html-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   volumeMode: Filesystem
   resources:
     requests:
       storage: 5Gi
-  volumeName: nextcloud-config-pv
+  volumeName: nextcloud-html-pv
 ---
 
 apiVersion: v1
@@ -56,7 +56,7 @@ metadata:
   name: nextcloud-data-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   volumeMode: Filesystem
   resources:
     requests:
@@ -67,15 +67,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nextcloud-service
+  name: nextcloud-fpm
 spec:
   selector:
     app: nextcloud
   ports:
-    - name: https
+    - name: php-fpm
       protocol: TCP
-      port: 443
-      targetPort: 443
+      port: 9000
+      targetPort: 9000
 ---
 
 apiVersion: apps/v1beta1
@@ -95,19 +95,66 @@ spec:
         app: nextcloud
     spec:
       volumes:
-        - name: nextcloud-config-volume
+        - name: nextcloud-html-volume
           persistentVolumeClaim:
-            claimName: nextcloud-config-pvc
+            claimName: nextcloud-html-pvc
         - name: nextcloud-data-volume
           persistentVolumeClaim:
             claimName: nextcloud-data-pvc
       containers:
-        - image: linuxserver/nextcloud:113
+        - image: nextcloud:13.0.0-fpm
           name: nextcloud
+          env:
+            - name: MYSQL_DATABASE
+              value: nextcloud
+            - name: MYSQL_USER
+              value: nextcloud
+            - name: MYSQL_PASSWORD
+              value: ß1046ß23863205671
+            - name: MYSQL_HOST
+              value: nextcloud-mariadb-service
+            - name: NEXTCLOUD_TABLE_PREFIX
+              value: "oc_"
+            - name: NEXTCLOUD_ADMIN_USER
+              value: admin
+            - name: NEXTCLOUD_ADMIN_PASSWORD
+              value: "75J)Fb.a"
           volumeMounts:
-            - mountPath: /config
-              name: nextcloud-config-volume
-            - mountPath: /data
-              name: nextcloud-data-volume
+            - name: nextcloud-html-volume
+              mountPath: /var/www/html
+            - name: nextcloud-data-volume
+              mountPath: /var/www/html/data
           ports:
-            - containerPort: 443
+            - containerPort: 9000
+---
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: nextcloud-cron
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: nextcloud-html-volume
+              persistentVolumeClaim:
+                claimName: nextcloud-html-pvc
+            - name: nextcloud-data-volume
+              persistentVolumeClaim:
+                claimName: nextcloud-data-pvc
+          containers:
+          - name: nextcloud-cron
+            image: nextcloud:13.0.0-fpm
+            command: ["php"]
+            args:
+              - -f
+              - /var/www/html/cron.php
+            volumeMounts:
+              - name: nextcloud-html-volume
+                mountPath: /var/www/html
+              - name: nextcloud-data-volume
+                mountPath: /var/www/html/data
+          restartPolicy: OnFailure

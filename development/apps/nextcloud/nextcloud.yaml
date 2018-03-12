@@ -126,18 +126,32 @@ spec:
               mountPath: /var/www/html/data
           ports:
             - containerPort: 9000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
 ---
 
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: nextcloud-cron
+  labels:
+    app: nextcloud-cron
 spec:
   schedule: "*/15 * * * *"
   jobTemplate:
+    metadata:
+      labels:
+        app: nextcloud-cron
     spec:
       template:
         spec:
+          securityContext:
+            runAsUser: 33
           volumes:
             - name: nextcloud-html-volume
               persistentVolumeClaim:
@@ -157,6 +171,13 @@ spec:
                 mountPath: /var/www/html
               - name: nextcloud-data-volume
                 mountPath: /var/www/html/data
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "250m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
           restartPolicy: OnFailure
 ---
 
@@ -164,12 +185,22 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: nextcloud-preview-cron
+  labels:
+    app: nextcloud-preview-cron
 spec:
   schedule: "*/30 * * * *"
   jobTemplate:
+    metadata:
+      labels:
+        app: nextcloud-preview-cron
     spec:
       template:
+        metadata:
+          labels:
+            app: nextcloud-preview-cron
         spec:
+          securityContext:
+            runAsUser: 33
           volumes:
             - name: nextcloud-html-volume
               persistentVolumeClaim:
@@ -189,4 +220,11 @@ spec:
                 mountPath: /var/www/html
               - name: nextcloud-data-volume
                 mountPath: /var/www/html/data
-          restartPolicy: OnFailure
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "250m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+          restartPolicy: Never

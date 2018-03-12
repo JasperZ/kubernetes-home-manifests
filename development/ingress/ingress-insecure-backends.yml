@@ -43,3 +43,24 @@ spec:
       - backend:
           serviceName: home-assistant-mosquitto-service
           servicePort: 8883
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nextcloud-jz-c-org
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: "16G"
+spec:
+  tls:
+  - hosts:
+    - nextcloud.jz-c.org
+    secretName: nextcloud.jz-c.org-tls
+  rules:
+  - host: nextcloud.jz-c.org
+    http:
+      paths:
+      - backend:
+          serviceName: nextcloud-nginx-service
+          servicePort: 80

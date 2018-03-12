@@ -70,7 +70,7 @@ spec:
     spec:
       containers:
         - image: "gogs/gogs:0.11.34"
-          name: nextcloud
+          name: gogs
           ports:
             - containerPort: 22
             - containerPort: 3000

@@ -158,3 +158,35 @@ spec:
               - name: nextcloud-data-volume
                 mountPath: /var/www/html/data
           restartPolicy: OnFailure
+---
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: nextcloud-preview-cron
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: nextcloud-html-volume
+              persistentVolumeClaim:
+                claimName: nextcloud-html-pvc
+            - name: nextcloud-data-volume
+              persistentVolumeClaim:
+                claimName: nextcloud-data-pvc
+          containers:
+          - name: nextcloud-preview-cron
+            image: nextcloud:13.0.0-fpm
+            command: ["php"]
+            args:
+              - /var/www/html/occ
+              - preview:pre-generate
+            volumeMounts:
+              - name: nextcloud-html-volume
+                mountPath: /var/www/html
+              - name: nextcloud-data-volume
+                mountPath: /var/www/html/data
+          restartPolicy: OnFailure

@@ -228,3 +228,42 @@ spec:
                 memory: "512Mi"
                 cpu: "500m"
           restartPolicy: Never
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nextcloud-generate-all-previews
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      securityContext:
+        runAsUser: 33
+      volumes:
+        - name: nextcloud-html-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-html-pvc
+        - name: nextcloud-data-volume
+          persistentVolumeClaim:
+            claimName: nextcloud-data-pvc
+      containers:
+      - name: nextcloud-preview-cron
+        image: nextcloud:13.0.0-fpm
+        command: ["php"]
+        args:
+          - /var/www/html/occ
+          - preview:generate-all
+        volumeMounts:
+          - name: nextcloud-html-volume
+            mountPath: /var/www/html
+          - name: nextcloud-data-volume
+            mountPath: /var/www/html/data
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      restartPolicy: Never

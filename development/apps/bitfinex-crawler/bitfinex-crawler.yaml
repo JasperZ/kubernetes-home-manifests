@@ -1,0 +1,48 @@
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: bitfinex-crawler
+  name: bitfinex-crawler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bitfinex-crawler
+  template:
+    metadata:
+      labels:
+        app: bitfinex-crawler
+    spec:
+      containers:
+        - image: zdock/bitfinex-crawler:1.0.1
+          name: bitfinex-crawler
+          env:
+            - name: BITFINEX_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bitfinex-crawler-api
+                  key: key
+            - name: BITFINEX_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bitfinex-crawler-api
+                  key: secret
+            - name: TICKER_SYMBOLS
+              value: "tBTCUSD,tETHUSD,tIOTUSD"
+            - name: INFLUXDB_HOST
+              value: "bitfinex-crawler-influxdb"
+            - name: INFLUXDB_DATABASE
+              value: "bitfinex"
+            - name: INFLUXDB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bitfinex-crawler-influxdb-write-user
+                  key: username
+            - name: INFLUXDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bitfinex-crawler-influxdb-write-user
+                  key: password

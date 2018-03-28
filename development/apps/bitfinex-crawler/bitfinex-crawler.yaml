@@ -17,8 +17,9 @@ spec:
         app: bitfinex-crawler
     spec:
       containers:
-        - image: zdock/bitfinex-crawler:latest
-          name: bitfinex-crawler
+        - name: bitfinex-crawler
+          image: zdock/bitfinex-crawler:latest
+          imagePullPolicy: Always
           env:
             - name: BITFINEX_API_KEY
               valueFrom:

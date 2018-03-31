@@ -21,16 +21,6 @@ spec:
           image: zdock/bitfinex-crawler:latest
           imagePullPolicy: Always
           env:
-            - name: BITFINEX_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: bitfinex-crawler-api
-                  key: key
-            - name: BITFINEX_API_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: bitfinex-crawler-api
-                  key: secret
             - name: TICKER_SYMBOLS
               value: "tBTCUSD,tETHUSD,tIOTUSD"
             - name: INFLUXDB_HOST

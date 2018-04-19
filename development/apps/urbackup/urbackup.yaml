@@ -125,3 +125,10 @@ spec:
             - containerPort: 55415
             - containerPort: 35623
               protocol: UDP
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

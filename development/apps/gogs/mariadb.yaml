@@ -61,6 +61,10 @@ spec:
       labels:
         app: gogs-mariadb
     spec:
+      volumes:
+        - name: mariadb-data-volume
+          persistentVolumeClaim:
+            claimName: gogs-mariadb-pvc
       containers:
         - name: gogs-mariadb
           image: mariadb:10.3
@@ -72,7 +76,10 @@ spec:
               mountPath: /var/lib/mysql
           ports:
             - containerPort: 3306
-      volumes:
-        - name: mariadb-data-volume
-          persistentVolumeClaim:
-            claimName: gogs-mariadb-pvc
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

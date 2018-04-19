@@ -38,9 +38,9 @@ spec:
                   name: bitfinex-crawler-influxdb-write-user
                   key: password
           resources:
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
             limits:
-              memory: "512Mi"
               cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"

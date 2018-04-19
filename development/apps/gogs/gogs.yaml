@@ -82,9 +82,9 @@ spec:
             - mountPath: /data
               name: gogs-data-volume
           resources:
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              cpu: "250m"
+              memory: "256Mi"
+            requests:
+              cpu: "125m"
+              memory: "128Mi"

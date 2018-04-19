@@ -105,7 +105,7 @@ spec:
           image: elasticsearch:5.6.8
           env:
             - name: ES_JAVA_OPTS
-              value: "-Xms1g -Xmx1g"
+              value: "-Xms768m -Xmx768m"
           volumeMounts:
             - name: nextcloud-elasticsearch-data-volume
               mountPath: /usr/share/elasticsearch/data
@@ -115,9 +115,9 @@ spec:
             - containerPort: 9200
             - containerPort: 9300
           resources:
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
             limits:
-              memory: "1024Mi"
-              cpu: "500m"
+              cpu: "250m"
+              memory: "1Gi"
+            requests:
+              cpu: "125m"
+              memory: "128Mi"

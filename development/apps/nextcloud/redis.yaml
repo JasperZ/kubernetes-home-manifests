@@ -73,3 +73,10 @@ spec:
               name: nextcloud-redis-data-volume
           ports:
             - containerPort: 6379
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

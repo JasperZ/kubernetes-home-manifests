@@ -82,3 +82,10 @@ spec:
               mountPath: /var/lib/mysql
           ports:
             - containerPort: 3306
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

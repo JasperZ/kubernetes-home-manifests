@@ -37,10 +37,10 @@ spec:
           value: "nextcloud\\.jz-c\\.org|test\\.jz-c\\.org"
         ports:
         - containerPort: 9980
-      resources:
-        requests:
-          memory: "128Mi"
-          cpu: "250m"
-        limits:
-          memory: "512Mi"
-          cpu: "500m"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

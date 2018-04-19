@@ -118,3 +118,10 @@ spec:
         ports:
         - containerPort: 1883
         - containerPort: 8883
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

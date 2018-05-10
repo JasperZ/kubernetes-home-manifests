@@ -159,7 +159,7 @@ spec:
           persistentVolumeClaim:
             claimName: nextcloud-html-pvc
       containers:
-        - image: nginx:1.13.9-alpine
+        - image: nginx:1.14.0-alpine
           name: nextcloud
           volumeMounts:
             - name: nginx-config-volume

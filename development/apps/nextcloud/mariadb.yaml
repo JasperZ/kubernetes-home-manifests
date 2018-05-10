@@ -67,7 +67,7 @@ spec:
             claimName: nextcloud-mariadb-data-pvc
       containers:
         - name: nextcloud-mariadb
-          image: mariadb:10.3.5
+          image: mariadb:10.3.6
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: 01928375jk1h5125

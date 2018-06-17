@@ -9,13 +9,13 @@ spec:
     storage: 5Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - nfsvers=3
   nfs:
     path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/bitfinex-crawler/influxdb/data
-    server: storage.zhc.x64.me
+    server: storage.zcc.x64.me
 ---
 
 apiVersion: v1

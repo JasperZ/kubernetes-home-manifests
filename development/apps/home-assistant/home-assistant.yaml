@@ -15,7 +15,7 @@ spec:
     - nfsvers=3
   nfs:
     path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/home-assistant/config
-    server: storage.zhc.x64.me
+    server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
@@ -70,7 +70,7 @@ spec:
           claimName: home-assistant-config-pvc
       containers:
       - name: home-assistant
-        image: homeassistant/home-assistant:0.68.1
+        image: homeassistant/home-assistant:0.71.0
         volumeMounts:
         - name: home-assistant-config-volume
           mountPath: /config

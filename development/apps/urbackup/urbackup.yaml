@@ -15,7 +15,7 @@ spec:
     - nfsvers=3
   nfs:
     path: /mnt/datacenter_1tb/kubernetes/production/persistent_volumes_manual/urbackup/backups
-    server: storage.zhc.x64.me
+    server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
@@ -33,7 +33,7 @@ spec:
     - nfsvers=3
   nfs:
     path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/database
-    server: storage.zhc.x64.me
+    server: storage.zcc.x64.me
 ---
 
 apiVersion: v1

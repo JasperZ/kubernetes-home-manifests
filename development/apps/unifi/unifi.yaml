@@ -13,7 +13,7 @@ spec:
     - nfsvers=3
   nfs:
     path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/unifi/config
-    server: storage.zhc.x64.me
+    server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
@@ -80,7 +80,7 @@ spec:
           claimName: unifi-config-pvc
       containers:
       - name: unifi
-        image: jacobalberty/unifi:5.7.19-sc-3ca0b231
+        image: jacobalberty/unifi:5.7
         env:
           - name: TZ
             value: Europe/Berlin

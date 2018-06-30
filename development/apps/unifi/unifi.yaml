@@ -108,7 +108,7 @@ spec:
           claimName: unifi-config-pvc
       containers:
       - name: unifi
-        image: jacobalberty/unifi:5.7
+        image: jacobalberty/unifi:5.8
         env:
           - name: TZ
             value: Europe/Berlin

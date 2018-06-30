@@ -70,7 +70,7 @@ spec:
           claimName: home-assistant-config-pvc
       containers:
       - name: home-assistant
-        image: homeassistant/home-assistant:0.71.0
+        image: homeassistant/home-assistant:0.72.1
         volumeMounts:
         - name: home-assistant-config-volume
           mountPath: /config

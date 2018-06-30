@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: collabora
-        image: collabora/code:3.2.1.4
+        image: collabora/code:3.2.2.1
         env:
         - name: domain
           value: "nextcloud\\.jz-c\\.org|test\\.jz-c\\.org"

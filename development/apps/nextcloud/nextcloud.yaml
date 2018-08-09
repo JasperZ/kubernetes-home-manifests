@@ -102,7 +102,7 @@ spec:
           persistentVolumeClaim:
             claimName: nextcloud-data-pvc
       containers:
-        - image: nextcloud:13.0.4-fpm
+        - image: nextcloud:13.0.5-fpm
           name: nextcloud
           env:
             - name: MYSQL_DATABASE
@@ -132,7 +132,7 @@ spec:
               cpu: "250m"
             limits:
               memory: "512Mi"
-              cpu: "500m"
+              cpu: "1"
 ---
 
 apiVersion: batch/v1beta1
@@ -161,7 +161,7 @@ spec:
                 claimName: nextcloud-data-pvc
           containers:
           - name: nextcloud-cron
-            image: nextcloud:13.0.4-fpm
+            image: nextcloud:13.0.5-fpm
             command: ["php"]
             args:
               - -f
@@ -210,7 +210,7 @@ spec:
 #                 claimName: nextcloud-data-pvc
 #           containers:
 #           - name: nextcloud-preview-cron
-#             image: nextcloud:13.0.4-fpm
+#             image: nextcloud:13.0.5-fpm
 #             command: ["php"]
 #             args:
 #               - /var/www/html/occ
@@ -249,11 +249,65 @@ spec:
 #             claimName: nextcloud-data-pvc
 #       containers:
 #       - name: nextcloud-preview-cron
-#         image: nextcloud:13.0.4-fpm
+#         image: nextcloud:13.0.5-fpm
 #         command: ["php"]
 #         args:
 #           - /var/www/html/occ
 #           - preview:generate-all
+#         volumeMounts:
+#           - name: nextcloud-html-volume
+#             mountPath: /var/www/html
+#           - name: nextcloud-data-volume
+#             mountPath: /var/www/html/data
+#         resources:
+#           requests:
+#             memory: "128Mi"
+#             cpu: "250m"
+#           limits:
+#             memory: "512Mi"
+#             cpu: "500m"
+#       restartPolicy: Never
+# ---
+#
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: nextcloud-index
+# spec:
+#   backoffLimit: 5
+#   template:
+#     spec:
+#       securityContext:
+#         runAsUser: 33
+#       volumes:
+#         - name: nextcloud-html-volume
+#           persistentVolumeClaim:
+#             claimName: nextcloud-html-pvc
+#         - name: nextcloud-data-volume
+#           persistentVolumeClaim:
+#             claimName: nextcloud-data-pvc
+#       containers:
+#       - name: nextcloud-preview-cron
+#         image: nextcloud:13.0.5-fpm
+#         command: ["php"]
+#         args:
+#           - /var/www/html/occ
+#           - fulltextsearch:index
+#         env:
+#           - name: MYSQL_DATABASE
+#             value: nextcloud
+#           - name: MYSQL_USER
+#             value: nextcloud
+#           - name: MYSQL_PASSWORD
+#             value: ß1046ß23863205671
+#           - name: MYSQL_HOST
+#             value: nextcloud-mariadb-service
+#           - name: NEXTCLOUD_TABLE_PREFIX
+#             value: "oc_"
+#           - name: NEXTCLOUD_ADMIN_USER
+#             value: admin
+#           - name: NEXTCLOUD_ADMIN_PASSWORD
+#             value: "75J)Fb.a"
 #         volumeMounts:
 #           - name: nextcloud-html-volume
 #             mountPath: /var/www/html

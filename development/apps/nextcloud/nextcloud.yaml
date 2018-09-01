@@ -102,7 +102,7 @@ spec:
           persistentVolumeClaim:
             claimName: nextcloud-data-pvc
       containers:
-        - image: nextcloud:13.0.5-fpm
+        - image: nextcloud:13.0.6-fpm
           name: nextcloud
           env:
             - name: MYSQL_DATABASE
@@ -161,7 +161,7 @@ spec:
                 claimName: nextcloud-data-pvc
           containers:
           - name: nextcloud-cron
-            image: nextcloud:13.0.5-fpm
+            image: nextcloud:13.0.6-fpm
             command: ["php"]
             args:
               - -f
@@ -210,7 +210,7 @@ spec:
 #                 claimName: nextcloud-data-pvc
 #           containers:
 #           - name: nextcloud-preview-cron
-#             image: nextcloud:13.0.5-fpm
+#             image: nextcloud:13.0.6-fpm
 #             command: ["php"]
 #             args:
 #               - /var/www/html/occ
@@ -249,7 +249,7 @@ spec:
 #             claimName: nextcloud-data-pvc
 #       containers:
 #       - name: nextcloud-preview-cron
-#         image: nextcloud:13.0.5-fpm
+#         image: nextcloud:13.0.6-fpm
 #         command: ["php"]
 #         args:
 #           - /var/www/html/occ
@@ -288,7 +288,7 @@ spec:
 #             claimName: nextcloud-data-pvc
 #       containers:
 #       - name: nextcloud-preview-cron
-#         image: nextcloud:13.0.5-fpm
+#         image: nextcloud:13.0.6-fpm
 #         command: ["php"]
 #         args:
 #           - /var/www/html/occ

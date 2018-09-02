@@ -73,13 +73,23 @@ spec:
             - --collation-server=utf8mb4_unicode_ci
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: XR24wbbZtC7Wm4jD
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-mariadb-root-user
+                  key: password
             - name: MYSQL_DATABASE
               value: homeassistant
             - name: MYSQL_USER
               value: homeassistant
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-mariadb-homeassistant-user
+                  key: username
             - name: MYSQL_PASSWORD
-              value: e20IXryibriu4K3l
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-mariadb-homeassistant-user
+                  key: password
           volumeMounts:
             - name: mariadb-data-volume
               mountPath: /var/lib/mysql

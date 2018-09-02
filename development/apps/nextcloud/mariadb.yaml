@@ -70,13 +70,22 @@ spec:
           image: mariadb:10.3.6
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: 01928375jk1h5125
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-mariadb-root-user
+                  key: password
             - name: MYSQL_DATABASE
               value: nextcloud
             - name: MYSQL_USER
-              value: nextcloud
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-mariadb-nextcloud-user
+                  key: username
             - name: MYSQL_PASSWORD
-              value: ß1046ß23863205671
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-mariadb-nextcloud-user
+                  key: password
           volumeMounts:
             - name: nextcloud-mariadb-data-volume
               mountPath: /var/lib/mysql

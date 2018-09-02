@@ -130,9 +130,15 @@ spec:
             - name: MYSQL_DATABASE
               value: nextcloud
             - name: MYSQL_USER
-              value: nextcloud
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-mariadb-nextcloud-user
+                  key: username
             - name: MYSQL_PASSWORD
-              value: ß1046ß23863205671
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-mariadb-nextcloud-user
+                  key: password
             - name: MYSQL_HOST
               value: nextcloud-mariadb-service
             - name: NEXTCLOUD_TABLE_PREFIX

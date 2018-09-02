@@ -80,7 +80,6 @@ spec:
             - name: MYSQL_DATABASE
               value: homeassistant
             - name: MYSQL_USER
-              value: homeassistant
               valueFrom:
                 secretKeyRef:
                   name: home-assistant-mariadb-homeassistant-user

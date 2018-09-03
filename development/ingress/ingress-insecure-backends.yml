@@ -17,7 +17,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: gogs-service
+          serviceName: gogs
           servicePort: 80
 ---
 

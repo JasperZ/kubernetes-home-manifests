@@ -3,7 +3,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nextcloud-mariadb-data-pv
+  name: nextcloud-mariadb-data
+  labels:
+    app: nextcloud
+    component: mariadb
+    tier: storage
 spec:
   capacity:
     storage: 5Gi
@@ -21,7 +25,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-mariadb-data-pvc
+  name: nextcloud-mariadb-data
+  labels:
+    app: nextcloud
+    component: mariadb
+    tier: storage
 spec:
   accessModes:
     - ReadWriteOnce
@@ -29,16 +37,22 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: nextcloud-mariadb-data-pv
+  volumeName: nextcloud-mariadb-data
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: nextcloud-mariadb-service
+  name: nextcloud-mariadb
+  labels:
+    app: nextcloud
+    component: mariadb
+    tier: database
 spec:
   selector:
-    app: nextcloud-mariadb
+    app: nextcloud
+    component: mariadb
+    tier: database
   ports:
     - protocol: TCP
       port: 3306
@@ -50,21 +64,27 @@ kind: Deployment
 metadata:
   name: nextcloud-mariadb
   labels:
-    app: nextcloud-mariadb
+    app: nextcloud
+    component: mariadb
+    tier: database
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nextcloud-mariadb
+      app: nextcloud
+      component: mariadb
+      tier: database
   template:
     metadata:
       labels:
-        app: nextcloud-mariadb
+        app: nextcloud
+        component: mariadb
+        tier: database
     spec:
       volumes:
-        - name: nextcloud-mariadb-data-volume
+        - name: data
           persistentVolumeClaim:
-            claimName: nextcloud-mariadb-data-pvc
+            claimName: nextcloud-mariadb-data
       containers:
         - name: nextcloud-mariadb
           image: mariadb:10.3.6
@@ -87,7 +107,7 @@ spec:
                   name: nextcloud-mariadb-nextcloud-user
                   key: password
           volumeMounts:
-            - name: nextcloud-mariadb-data-volume
+            - name: data
               mountPath: /var/lib/mysql
           ports:
             - containerPort: 3306

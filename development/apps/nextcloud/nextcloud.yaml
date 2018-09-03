@@ -3,7 +3,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nextcloud-html-pv
+  name: nextcloud-html
+  labels:
+    app: nextcloud
+    component: nextcloud
+    tier: storage
 spec:
   capacity:
     storage: 5Gi
@@ -14,14 +18,18 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/html
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/nextcloud/nextcloud/html
     server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nextcloud-data-pv
+  name: nextcloud-data
+  labels:
+    app: nextcloud
+    component: nextcloud
+    tier: storage
 spec:
   capacity:
     storage: 5Gi
@@ -32,14 +40,18 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_1tb/kubernetes/production/persistent_volumes_manual/nextcloud/data
+    path: /mnt/datacenter_1tb/kubernetes/production/persistent_volumes_manual/nextcloud/nextcloud/data
     server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-html-pvc
+  name: nextcloud-html
+  labels:
+    app: nextcloud
+    component: nextcloud
+    tier: storage
 spec:
   accessModes:
     - ReadWriteMany
@@ -47,13 +59,17 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: nextcloud-html-pv
+  volumeName: nextcloud-html
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nextcloud-data-pvc
+  name: nextcloud-data
+  labels:
+    app: nextcloud
+    component: nextcloud
+    tier: storage
 spec:
   accessModes:
     - ReadWriteMany
@@ -61,13 +77,17 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: nextcloud-data-pv
+  volumeName: nextcloud-data
 ---
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nextcloud-php-fpm-config
+  name: nextcloud-php-fpm
+  labels:
+    app: nextcloud
+    component: nextcloud
+    tier: data
 data:
   www.conf: |
     [www]
@@ -87,9 +107,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nextcloud-fpm
+  labels:
+    app: nextcloud
+    component: nextcloud
+    tier: frontend
 spec:
   selector:
     app: nextcloud
+    component: nextcloud
+    tier: frontend
   ports:
     - name: php-fpm
       protocol: TCP
@@ -100,29 +126,35 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
+  name: nextcloud
   labels:
     app: nextcloud
-  name: nextcloud
+    component: nextcloud
+    tier: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: nextcloud
+      component: nextcloud
+      tier: frontend
   template:
     metadata:
       labels:
         app: nextcloud
+        component: nextcloud
+        tier: frontend
     spec:
       volumes:
-        - name: nextcloud-php-fpm-config-volume
+        - name: php-fpm
           configMap:
-            name: nextcloud-php-fpm-config
-        - name: nextcloud-html-volume
+            name: nextcloud-php-fpm
+        - name: html
           persistentVolumeClaim:
-            claimName: nextcloud-html-pvc
-        - name: nextcloud-data-volume
+            claimName: nextcloud-html
+        - name: data
           persistentVolumeClaim:
-            claimName: nextcloud-data-pvc
+            claimName: nextcloud-data
       containers:
         - image: nextcloud:13.0.6-fpm
           name: nextcloud
@@ -148,12 +180,12 @@ spec:
             - name: NEXTCLOUD_ADMIN_PASSWORD
               value: "75J)Fb.a"
           volumeMounts:
-            - name: nextcloud-php-fpm-config-volume
+            - name: php-fpm
               mountPath: /usr/local/etc/php-fpm.d/www.conf
               subPath: www.conf
-            - name: nextcloud-html-volume
+            - name: html
               mountPath: /var/www/html
-            - name: nextcloud-data-volume
+            - name: data
               mountPath: /var/www/html/data
           ports:
             - containerPort: 9000
@@ -171,25 +203,29 @@ kind: CronJob
 metadata:
   name: nextcloud-cron
   labels:
-    app: nextcloud-cron
+    app: nextcloud
+    component: nextcloud-cron
+    tier: frontend
 spec:
   schedule: "*/15 * * * *"
   jobTemplate:
     metadata:
       labels:
-        app: nextcloud-cron
+        app: nextcloud
+        component: nextcloud-cron
+        tier: frontend
     spec:
       template:
         spec:
           securityContext:
             runAsUser: 33
           volumes:
-            - name: nextcloud-html-volume
+            - name: html
               persistentVolumeClaim:
-                claimName: nextcloud-html-pvc
-            - name: nextcloud-data-volume
+                claimName: nextcloud-html
+            - name: data
               persistentVolumeClaim:
-                claimName: nextcloud-data-pvc
+                claimName: nextcloud-data
           containers:
           - name: nextcloud-cron
             image: nextcloud:13.0.6-fpm
@@ -198,9 +234,9 @@ spec:
               - -f
               - /var/www/html/cron.php
             volumeMounts:
-              - name: nextcloud-html-volume
+              - name: html
                 mountPath: /var/www/html
-              - name: nextcloud-data-volume
+              - name: data
                 mountPath: /var/www/html/data
             resources:
               requests:
@@ -217,28 +253,34 @@ spec:
 # metadata:
 #   name: nextcloud-preview-cron
 #   labels:
-#     app: nextcloud-preview-cron
+#    app: nextcloud
+#    component: nextcloud-preview-cron
+#    tier: frontend
 # spec:
 #   schedule: "*/30 * * * *"
 #   jobTemplate:
 #     metadata:
 #       labels:
-#         app: nextcloud-preview-cron
+#         app: nextcloud
+#         component: nextcloud-preview-cron
+#         tier: frontend
 #     spec:
 #       template:
 #         metadata:
 #           labels:
-#             app: nextcloud-preview-cron
+#             app: nextcloud
+#             component: nextcloud-preview-cron
+#             tier: frontend
 #         spec:
 #           securityContext:
 #             runAsUser: 33
 #           volumes:
-#             - name: nextcloud-html-volume
+#             - name: html
 #               persistentVolumeClaim:
-#                 claimName: nextcloud-html-pvc
-#             - name: nextcloud-data-volume
+#                 claimName: nextcloud-html
+#             - name: data
 #               persistentVolumeClaim:
-#                 claimName: nextcloud-data-pvc
+#                 claimName: nextcloud-data
 #           containers:
 #           - name: nextcloud-preview-cron
 #             image: nextcloud:13.0.6-fpm
@@ -247,9 +289,9 @@ spec:
 #               - /var/www/html/occ
 #               - preview:pre-generate
 #             volumeMounts:
-#               - name: nextcloud-html-volume
+#               - name: html
 #                 mountPath: /var/www/html
-#               - name: nextcloud-data-volume
+#               - name: data
 #                 mountPath: /var/www/html/data
 #             resources:
 #               requests:
@@ -265,6 +307,10 @@ spec:
 # kind: Job
 # metadata:
 #   name: nextcloud-generate-all-previews
+#   labels:
+#    app: nextcloud
+#    component: nextcloud-generate-all-previews
+#    tier: frontend
 # spec:
 #   backoffLimit: 5
 #   template:
@@ -272,12 +318,12 @@ spec:
 #       securityContext:
 #         runAsUser: 33
 #       volumes:
-#         - name: nextcloud-html-volume
+#         - name: html
 #           persistentVolumeClaim:
-#             claimName: nextcloud-html-pvc
-#         - name: nextcloud-data-volume
+#             claimName: nextcloud-html
+#         - name: data
 #           persistentVolumeClaim:
-#             claimName: nextcloud-data-pvc
+#             claimName: nextcloud-data
 #       containers:
 #       - name: nextcloud-preview-cron
 #         image: nextcloud:13.0.6-fpm
@@ -286,9 +332,9 @@ spec:
 #           - /var/www/html/occ
 #           - preview:generate-all
 #         volumeMounts:
-#           - name: nextcloud-html-volume
+#           - name: html
 #             mountPath: /var/www/html
-#           - name: nextcloud-data-volume
+#           - name: data
 #             mountPath: /var/www/html/data
 #         resources:
 #           requests:
@@ -304,6 +350,10 @@ spec:
 # kind: Job
 # metadata:
 #   name: nextcloud-index
+#   labels:
+#    app: nextcloud
+#    component: nextcloud-index
+#    tier: frontend
 # spec:
 #   backoffLimit: 5
 #   template:

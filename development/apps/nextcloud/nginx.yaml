@@ -3,7 +3,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nextcloud-nginx-config
+  name: nextcloud-nginx
+  labels:
+    app: nextcloud
+    component: nginx
+    tier: data
 data:
   nextcloud.conf: |
     server {
@@ -124,10 +128,16 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nextcloud-nginx-service
+  name: nextcloud-nginx
+  labels:
+    app: nextcloud
+    component: nginx
+    tier: frontend
 spec:
   selector:
-    app: nextcloud-nginx
+    app: nextcloud
+    component: nginx
+    tier: frontend
   ports:
     - name: http
       protocol: TCP
@@ -138,33 +148,39 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  labels:
-    app: nextcloud-nginx
   name: nextcloud-nginx
+  labels:
+    app: nextcloud
+    component: nginx
+    tier: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nextcloud-nginx
+      app: nextcloud
+      component: nginx
+      tier: frontend
   template:
     metadata:
       labels:
-        app: nextcloud-nginx
+        app: nextcloud
+        component: nginx
+        tier: frontend
     spec:
       volumes:
-        - name: nginx-config-volume
+        - name: config
           configMap:
-            name: nextcloud-nginx-config
-        - name: nextcloud-html-volume
+            name: nextcloud-nginx
+        - name: html
           persistentVolumeClaim:
-            claimName: nextcloud-html-pvc
+            claimName: nextcloud-html
       containers:
         - image: nginx:1.14.0-alpine
           name: nextcloud
           volumeMounts:
-            - name: nginx-config-volume
+            - name: config
               mountPath: /etc/nginx/conf.d
-            - name: nextcloud-html-volume
+            - name: html
               mountPath: /var/www/html
               readOnly: true
           ports:

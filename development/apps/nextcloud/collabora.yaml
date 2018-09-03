@@ -3,10 +3,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: collabora-service
+  name: nextcloud-collabora
+  labels:
+    app: nextcloud
+    component: collabora
+    tier: frontend
 spec:
   selector:
-    app: collabora
+    app: nextcloud
+    component: collabora
+    tier: frontend
   ports:
   - protocol: TCP
     port: 443
@@ -16,21 +22,27 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: collabora
+  name: nextcloud-collabora
   labels:
-    app: collabora
+    app: nextcloud
+    component: collabora
+    tier: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: collabora
+      app: nextcloud
+      component: collabora
+      tier: frontend
   template:
     metadata:
       labels:
-        app: collabora
+        app: nextcloud
+        component: collabora
+        tier: frontend
     spec:
       containers:
-      - name: collabora
+      - name: nextcloud-collabora
         image: collabora/code:3.2.2.1
         env:
         - name: domain

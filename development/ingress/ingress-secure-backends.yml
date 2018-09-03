@@ -17,5 +17,5 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: collabora-service
+          serviceName: collabora
           servicePort: 443

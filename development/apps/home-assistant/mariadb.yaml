@@ -3,7 +3,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: home-assistant-mariadb-pv
+  name: home-assistant-mariadb
+  labels:
+    app: home-assistant
+    component: mariadb
+    tier: storage
 spec:
   capacity:
     storage: 5Gi
@@ -21,7 +25,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: home-assistant-mariadb-pvc
+  name: home-assistant-mariadb
+  labels:
+    app: home-assistant
+    component: mariadb
+    tier: storage
 spec:
   accessModes:
     - ReadWriteOnce
@@ -29,16 +37,22 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: home-assistant-mariadb-pv
+  volumeName: home-assistant-mariadb
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: home-assistant-mariadb-service
+  name: home-assistant-mariadb
+  labels:
+    app: home-assistant
+    component: mariadb
+    tier: database
 spec:
   selector:
-    app: home-assistant-mariadb
+    app: home-assistant
+    component: mariadb
+    tier: database
   ports:
     - protocol: TCP
       port: 3306
@@ -50,21 +64,27 @@ kind: Deployment
 metadata:
   name: home-assistant-mariadb
   labels:
-    app: home-assistant-mariadb
+    app: home-assistant
+    component: mariadb
+    tier: database
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: home-assistant-mariadb
+      app: home-assistant
+      component: mariadb
+      tier: database
   template:
     metadata:
       labels:
-        app: home-assistant-mariadb
+        app: home-assistant
+        component: mariadb
+        tier: database
     spec:
       volumes:
-        - name: mariadb-data-volume
+        - name: data
           persistentVolumeClaim:
-            claimName: home-assistant-mariadb-pvc
+            claimName: home-assistant-mariadb
       containers:
         - name: home-assistant-mariadb
           image: mariadb:10.3
@@ -90,7 +110,7 @@ spec:
                   name: home-assistant-mariadb-homeassistant-user
                   key: password
           volumeMounts:
-            - name: mariadb-data-volume
+            - name: data
               mountPath: /var/lib/mysql
           ports:
             - containerPort: 3306

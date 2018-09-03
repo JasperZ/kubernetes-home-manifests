@@ -3,7 +3,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: home-assistant-mosquitto-config-pv
+  name: home-assistant-mosquitto-config
+  labels:
+    app: home-assistant
+    component: mosquitto
+    tier: storage
 spec:
   capacity:
     storage: 5Gi
@@ -14,14 +18,18 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/home-assistant/mosquitto/config
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/home-assistant/mosquitto/mosquitto/config
     server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: home-assistant-mosquitto-data-pv
+  name: home-assistant-mosquitto-data
+  labels:
+    app: home-assistant
+    component: mosquitto
+    tier: storage
 spec:
   capacity:
     storage: 5Gi
@@ -32,14 +40,18 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/home-assistant/mosquitto/data
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/home-assistant/mosquitto/mosquitto/data
     server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: home-assistant-mosquitto-config-pvc
+  name: home-assistant-mosquitto-config
+  labels:
+    app: home-assistant
+    component: mosquitto
+    tier: storage
 spec:
   accessModes:
     - ReadWriteOnce
@@ -47,13 +59,17 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: home-assistant-mosquitto-config-pv
+  volumeName: home-assistant-mosquitto-config
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: home-assistant-mosquitto-data-pvc
+  name: home-assistant-mosquitto-data
+  labels:
+    app: home-assistant
+    component: mosquitto
+    tier: storage
 spec:
   accessModes:
     - ReadWriteOnce
@@ -61,16 +77,22 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: home-assistant-mosquitto-data-pv
+  volumeName: home-assistant-mosquitto-data
 ---
 
 kind: Service
 apiVersion: v1
 metadata:
-  name: home-assistant-mosquitto-service
+  name: home-assistant-mosquitto
+  labels:
+    app: home-assistant
+    component: mosquitto
+    tier: broker
 spec:
   selector:
-    app: home-assistant-mosquitto
+    app: home-assistant
+    component: mosquitto
+    tier: broker
   ports:
   - name: unencrypted
     protocol: TCP
@@ -89,31 +111,37 @@ kind: Deployment
 metadata:
   name: home-assistant-mosquitto
   labels:
-    app: home-assistant-mosquitto
+    app: home-assistant
+    component: mosquitto
+    tier: broker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: home-assistant-mosquitto
+      app: home-assistant
+      component: mosquitto
+      tier: broker
   template:
     metadata:
       labels:
-        app: home-assistant-mosquitto
+        app: home-assistant
+        component: mosquitto
+        tier: broker
     spec:
       volumes:
-      - name: mosquitto-config-volume
+      - name: config
         persistentVolumeClaim:
-          claimName: home-assistant-mosquitto-config-pvc
-      - name: mosquitto-data-volume
+          claimName: home-assistant-mosquitto-config
+      - name: data
         persistentVolumeClaim:
-          claimName: home-assistant-mosquitto-data-pvc
+          claimName: home-assistant-mosquitto-data
       containers:
       - name: home-assistant-mosquitto
         image: eclipse-mosquitto:1.4.12
         volumeMounts:
-        - name: mosquitto-config-volume
+        - name: config
           mountPath: /mosquitto/config
-        - name: mosquitto-data-volume
+        - name: data
           mountPath: /mosquitto/data
         ports:
         - containerPort: 1883

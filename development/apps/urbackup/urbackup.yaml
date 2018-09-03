@@ -3,7 +3,11 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: urbackup-backups-pv
+  name: urbackup-backups
+  labels:
+    app: urbackup
+    component: urbackup
+    tier: storage
 spec:
   capacity:
     storage: 5Gi
@@ -14,14 +18,18 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_1tb/kubernetes/production/persistent_volumes_manual/urbackup/backups
+    path: /mnt/datacenter_1tb/kubernetes/production/persistent_volumes_manual/urbackup/urbackup/backups
     server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: urbackup-database-pv
+  name: urbackup-database
+  labels:
+    app: urbackup
+    component: urbackup
+    tier: storage
 spec:
   capacity:
     storage: 5Gi
@@ -32,14 +40,18 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/database
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/urbackup/database
     server: storage.zcc.x64.me
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: urbackup-backups-pvc
+  name: urbackup-backups
+  labels:
+    app: urbackup
+    component: urbackup
+    tier: storage
 spec:
   accessModes:
     - ReadWriteOnce
@@ -47,13 +59,17 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: urbackup-backups-pv
+  volumeName: urbackup-backups
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: urbackup-database-pvc
+  name: urbackup-database
+  labels:
+    app: urbackup
+    component: urbackup
+    tier: storage
 spec:
   accessModes:
     - ReadWriteOnce
@@ -61,16 +77,22 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  volumeName: urbackup-database-pv
+  volumeName: urbackup-database
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: urbackup-service
+  name: urbackup
+  labels:
+    app: urbackup
+    component: urbackup
+    tier: frontend
 spec:
   selector:
     app: urbackup
+    component: urbackup
+    tier: frontend
   ports:
     - name: fast-cgi
       protocol: TCP
@@ -91,34 +113,40 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
+  name: urbackup
   labels:
     app: urbackup
-  name: urbackup
+    component: urbackup
+    tier: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: urbackup
+      component: urbackup
+      tier: frontend
   template:
     metadata:
       labels:
         app: urbackup
+        component: urbackup
+        tier: frontend
     spec:
       volumes:
-        - name: urbackup-backups-volume
+        - name: backups
           persistentVolumeClaim:
-            claimName: urbackup-backups-pvc
-        - name: urbackup-database-volume
+            claimName: urbackup-backups
+        - name: database
           persistentVolumeClaim:
-            claimName: urbackup-database-pvc
+            claimName: urbackup-database
       containers:
         - image: uroni/urbackup-server:latest
           name: urbackup
           volumeMounts:
             - mountPath: /backups
-              name: urbackup-backups-volume
+              name: backups
             - mountPath: /var/urbackup
-              name: urbackup-database-volume
+              name: database
           ports:
             - containerPort: 55413
             - containerPort: 55414

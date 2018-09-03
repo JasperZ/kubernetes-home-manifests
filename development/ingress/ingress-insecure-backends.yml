@@ -27,7 +27,7 @@ metadata:
   name: mqtt-jz-c-org
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    nginx.org/websocket-services: "home-assistant-mosquitto-service"
+    nginx.org/websocket-services: "home-assistant-mosquitto"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
 
@@ -41,7 +41,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: home-assistant-mosquitto-service
+          serviceName: home-assistant-mosquitto
           servicePort: 8883
 ---
 

@@ -17,5 +17,5 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: collabora
+          serviceName: nextcloud-collabora
           servicePort: 443

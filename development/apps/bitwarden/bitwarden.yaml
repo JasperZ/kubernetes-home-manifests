@@ -1,0 +1,112 @@
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: bitwarden-data
+  labels:
+    app: bitwarden
+    component: bitwarden
+    tier: storage
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/bitwarden/bitwarden/data
+    server: storage.zcc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bitwarden-data
+  labels:
+    app: bitwarden
+    component: bitwarden
+    tier: storage
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: bitwarden-data
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bitwarden
+  labels:
+    app: bitwarden
+    component: bitwarden
+    tier: frontend
+spec:
+  selector:
+    app: bitwarden
+    component: bitwarden
+    tier: frontend
+  ports:
+    - name: php-fpm
+      protocol: TCP
+      port: 80
+      targetPort: 80
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: bitwarden
+  labels:
+    app: bitwarden
+    component: bitwarden
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bitwarden
+      component: bitwarden
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: bitwarden
+        component: bitwarden
+        tier: frontend
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bitwarden-data
+      containers:
+        - image: mprasil/bitwarden:1.0.0
+          name: bitwarden
+          env:
+            - name: MYSQL_HOST
+              value: bitwarden-mariadb-service
+            - name: bitwarden_TABLE_PREFIX
+              value: "oc_"
+            - name: bitwarden_ADMIN_USER
+              value: admin
+            - name: bitwarden_ADMIN_PASSWORD
+              value: "75J)Fb.a"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"

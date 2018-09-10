@@ -90,14 +90,8 @@ spec:
         - image: mprasil/bitwarden:1.0.0
           name: bitwarden
           env:
-            - name: MYSQL_HOST
-              value: bitwarden-mariadb-service
-            - name: bitwarden_TABLE_PREFIX
-              value: "oc_"
-            - name: bitwarden_ADMIN_USER
-              value: admin
-            - name: bitwarden_ADMIN_PASSWORD
-              value: "75J)Fb.a"
+            - name: DOMAIN
+              value: https://bitwarden.jz-c.org
           volumeMounts:
             - name: data
               mountPath: /data

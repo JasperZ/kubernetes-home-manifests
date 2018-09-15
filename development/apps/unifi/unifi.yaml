@@ -134,7 +134,7 @@ spec:
           claimName: unifi-config
       containers:
       - name: unifi
-        image: jacobalberty/unifi:5.8.28
+        image: jacobalberty/unifi:5.8.30
         env:
           - name: TZ
             value: Europe/Berlin
@@ -154,7 +154,7 @@ spec:
         resources:
           limits:
             cpu: "250m"
-            memory: "512Mi"
+            memory: "1024Mi"
           requests:
             cpu: "250m"
             memory: "256Mi"

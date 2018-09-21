@@ -103,6 +103,26 @@ spec:
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
+  name: home-assistant.jz-c.org-cert
+  namespace: default
+spec:
+  secretName: home-assistant.jz-c.org-tls
+  issuerRef:
+    name: letsencrypt-production-issuer
+  commonName: home-assistant.jz-c.org
+  dnsNames:
+  - home-assistant.jz-c.org
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - home-assistant.jz-c.org
+---
+
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
   name: test.jz-c.org-cert
   namespace: default
 spec:

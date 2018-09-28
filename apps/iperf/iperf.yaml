@@ -1,0 +1,31 @@
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: iperf
+  name: iperf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iperf
+  template:
+    metadata:
+      labels:
+        app: iperf
+    spec:
+      containers:
+        - image: networkstatic/iperf3:latest
+          command:
+            - sleep
+            - "3600"
+          name: iperf
+          resources:
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+            requests:
+              cpu: "125m"
+              memory: "128Mi"

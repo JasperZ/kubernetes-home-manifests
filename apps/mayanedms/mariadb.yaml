@@ -1,0 +1,94 @@
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mayan-edms-mariadb-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/mayan-edms/mariadb
+    server: storage.zcc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mayan-edms-mariadb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: mayan-edms-mariadb-pv
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mayan-edms-mariadb-service
+spec:
+  selector:
+    app: mayan-edms-mariadb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mayan-edms-mariadb
+  labels:
+    app: mayan-edms-mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mayan-edms-mariadb
+  template:
+    metadata:
+      labels:
+        app: mayan-edms-mariadb
+    spec:
+      volumes:
+        - name: mariadb-data-volume
+          persistentVolumeClaim:
+            claimName: mayan-edms-mariadb-pvc
+      containers:
+        - name: mayan-edms-mariadb
+          image: mariadb:10.3
+          args:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: jlbKcoRSrZBZSNwT
+            - name: MYSQL_DATABASE
+              value: mayan
+            - name: MYSQL_USER
+              value: mayan
+            - name: MYSQL_PASSWORD
+              value: RCT30OTDISsiZWDg
+          volumeMounts:
+            - name: mariadb-data-volume
+              mountPath: /var/lib/mysql
+          ports:
+            - containerPort: 3306
+          resources:
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+            requests:
+              cpu: "125m"
+              memory: "128Mi"

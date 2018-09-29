@@ -90,7 +90,7 @@ spec:
           claimName: tasmoadmin-data
       containers:
       - name: tasmoadmin
-        image: raymondmm/tasmoadmin:v1.5.4
+        image: raymondmm/tasmoadmin:v1.6.0
         volumeMounts:
         - name: data
           mountPath: /data

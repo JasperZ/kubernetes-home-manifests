@@ -26,6 +26,9 @@ data:
         add_header X-Download-Options noopen;
         add_header X-Permitted-Cross-Domain-Policies none;
 
+        # Remove X-Powered-By, which is an information leak
+        fastcgi_hide_header X-Powered-By;
+
         # Path to the root of your installation
         root /var/www/html/;
 
@@ -65,7 +68,7 @@ data:
         #pagespeed off;
 
         location / {
-            rewrite ^ /index.php$uri;
+            rewrite ^ /index.php$request_uri;
         }
 
         location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
@@ -76,13 +79,14 @@ data:
         }
 
         location ~ ^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[12]|updater/.+|ocs-provider/.+)\.php(?:$|/) {
-            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            fastcgi_split_path_info ^(.+?\.php)(/.*)$;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             fastcgi_param PATH_INFO $fastcgi_path_info;
             #Avoid sending the security headers twice
             fastcgi_param modHeadersAvailable true;
             fastcgi_param front_controller_active true;
+            fastcgi_read_timeout 600s;
             fastcgi_pass nextcloud-fpm:9000;
             fastcgi_intercept_errors on;
             fastcgi_request_buffering off;
@@ -96,7 +100,7 @@ data:
         # Adding the cache control header for js and css files
         # Make sure it is BELOW the PHP block
         location ~ \.(?:css|js|woff|svg|gif)$ {
-            try_files $uri /index.php$uri$is_args$args;
+            try_files $uri /index.php$request_uri;
             add_header Cache-Control "public, max-age=15778463";
             # Add headers to serve security related headers (It is intended to
             # have those duplicated to the ones above)
@@ -114,12 +118,14 @@ data:
             add_header X-Robots-Tag none;
             add_header X-Download-Options noopen;
             add_header X-Permitted-Cross-Domain-Policies none;
+            add_header Referrer-Policy no-referrer;
+
             # Optional: Don't log access to assets
             access_log off;
         }
 
         location ~ \.(?:png|html|ttf|ico|jpg|jpeg)$ {
-            try_files $uri /index.php$uri$is_args$args;
+            try_files $uri /index.php$request_uri;
             # Optional: Don't log access to other assets
             access_log off;
         }

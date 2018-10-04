@@ -62,7 +62,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: nextcloud-nginx
+          serviceName: nextcloud
           servicePort: 80
 ---
 

@@ -107,10 +107,10 @@ spec:
                 secretKeyRef:
                   name: prometheus.grafana.admin
                   key: password
-            - name: GF_SESSION_PROVIDER
-              value: "redis"
-            - name: GF_SESSION_PROVIDER_CONFIG
-              value: "addr=localhost:6379,pool_size=100,prefix=grafana"
+            # - name: GF_SESSION_PROVIDER
+            #   value: "redis"
+            # - name: GF_SESSION_PROVIDER_CONFIG
+            #   value: "addr=localhost:6379,pool_size=100,prefix=grafana"
           volumeMounts:
             - name: data
               mountPath: /var/lib/grafana
@@ -123,14 +123,14 @@ spec:
           #   requests:
           #     cpu: "250m"
           #     memory: "128Mi"
-        - image: redis:4.0.11-alpine
-          name: redis
-          ports:
-            - containerPort: 6379
-          resources:
-            limits:
-              cpu: "250m"
-              memory: "256Mi"
-            requests:
-              cpu: "125m"
-              memory: "128Mi"
+        # - image: redis:4.0.11-alpine
+        #   name: redis
+        #   ports:
+        #     - containerPort: 6379
+        #   resources:
+        #     limits:
+        #       cpu: "250m"
+        #       memory: "256Mi"
+        #     requests:
+        #       cpu: "125m"
+        #       memory: "128Mi"

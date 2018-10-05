@@ -80,13 +80,16 @@ spec:
         app: home-assistant
         component: mariadb
         tier: database
+      annotations:
+        prometheus.io/port: '9104'
+        prometheus.io/scrape: 'true'
     spec:
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: home-assistant-mariadb
       containers:
-        - name: home-assistant-mariadb
+        - name: mariadb
           image: mariadb:10.3
           args:
             - --character-set-server=utf8mb4
@@ -121,3 +124,16 @@ spec:
             requests:
               cpu: "125m"
               memory: "128Mi"
+        # CREATE USER 'prometheus'@'%' IDENTIFIED BY 'PASSWORD' WITH MAX_USER_CONNECTIONS 3;
+        # GRANT PROCESS, REPLICATION CLIENT ON *.* TO 'prometheus'@'%';
+        # GRANT SELECT ON performance_schema.* TO 'prometheus'@'%';
+        - name: mysqld-exporter
+          image: prom/mysqld-exporter:v0.11.0
+          env:
+            - name: DATA_SOURCE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: prometheus.mysql-exporter.data-source-name
+                  key: data-source-name
+          ports:
+            - containerPort: 9104

@@ -58,10 +58,6 @@ spec:
       protocol: TCP
       port: 3306
       targetPort: 3306
-    - name: mysqld-exporter
-      protocol: TCP
-      port: 9104
-      targetPort: 9104
 ---
 
 apiVersion: apps/v1beta1

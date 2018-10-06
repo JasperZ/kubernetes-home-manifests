@@ -48,6 +48,10 @@ metadata:
     app: nextcloud
     component: mariadb
     tier: database
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path: /metrics
+    prometheus.io/port: '9104'
 spec:
   selector:
     app: nextcloud
@@ -81,9 +85,6 @@ spec:
         app: nextcloud
         component: mariadb
         tier: database
-      annotations:
-        prometheus.io/port: '9104'
-        prometheus.io/scrape: 'true'
     spec:
       volumes:
         - name: data

@@ -285,7 +285,7 @@ spec:
           persistentVolumeClaim:
             claimName: nextcloud-data
       containers:
-        - image: nextcloud:14.0.1-fpm
+        - image: nextcloud:14.0.2-fpm
           name: nextcloud
           env:
             - name: MYSQL_DATABASE
@@ -372,7 +372,7 @@ spec:
                 claimName: nextcloud-data
           containers:
           - name: nextcloud-cron
-            image: nextcloud:14.0.1-fpm
+            image: nextcloud:14.0.2-fpm
             command: ["php"]
             args:
               - -f
@@ -427,7 +427,7 @@ spec:
                 claimName: nextcloud-data
           containers:
           - name: nextcloud-preview-cron
-            image: nextcloud:14.0.1-fpm
+            image: nextcloud:14.0.2-fpm
             command: ["php"]
             args:
               - /var/www/html/occ
@@ -470,7 +470,7 @@ spec:
 #             claimName: nextcloud-data
 #       containers:
 #       - name: nextcloud-preview-cron
-#         image: nextcloud:14.0.1-fpm
+#         image: nextcloud:14.0.2-fpm
 #         command: ["php"]
 #         args:
 #           - /var/www/html/occ
@@ -513,7 +513,7 @@ spec:
 #             claimName: nextcloud-data-pvc
 #       containers:
 #       - name: nextcloud-preview-cron
-#         image: nextcloud:14.0.1-fpm
+#         image: nextcloud:14.0.2-fpm
 #         command: ["php"]
 #         args:
 #           - /var/www/html/occ

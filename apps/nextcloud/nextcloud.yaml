@@ -401,7 +401,7 @@ metadata:
    component: nextcloud-preview-cron
    tier: frontend
 spec:
-  schedule: "*/30 * * * *"
+  schedule: "* 5 * * *"
   jobTemplate:
     metadata:
       labels:

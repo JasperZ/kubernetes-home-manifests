@@ -40,8 +40,8 @@ spec:
   volumeName: home-assistant-esphomeyaml
 ---
 
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
   name: home-assistant-esphomeyaml
   labels:

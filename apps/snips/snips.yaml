@@ -13,7 +13,7 @@ spec:
     storage: 5Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
     - nfsvers=3
@@ -32,7 +32,7 @@ metadata:
     tier: storage
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   volumeMode: Filesystem
   resources:
     requests:
@@ -69,6 +69,7 @@ spec:
       containers:
       - name: snips-asr
         image: zdock/snips-asr:latest
+        imagePullPolicy: Always
         env:
         - name: MQTT_HOST
           value: "home-assistant-mosquitto"
@@ -87,79 +88,87 @@ spec:
         volumeMounts:
         - name: assistant
           mountPath: /assistant
-      # - name: snips-tts
-      #   image: zdock/snips-tts:latest
-      #   - name: MQTT_HOST
-      #     value: "home-assistant-mosquitto"
-      #   - name: MQTT_PORT
-      #     value: "1883"
-      #   - name: MQTT_USERNAME
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: snips.mqtt.user
-      #         key: username
-      #   - name: MQTT_PASSWORD
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: snips.mqtt.user
-      #         key: password
-      #   volumeMounts:
-      #   - name: assistant
-      #     mountPath: /assistant
-      # - name: snips-hotword
-      #   image: zdock/snips-hotword:latest
-      #   - name: MQTT_HOST
-      #     value: "home-assistant-mosquitto"
-      #   - name: MQTT_PORT
-      #     value: "1883"
-      #   - name: MQTT_USERNAME
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: snips.mqtt.user
-      #         key: username
-      #   - name: MQTT_PASSWORD
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: snips.mqtt.user
-      #         key: password
-      #   volumeMounts:
-      #   - name: assistant
-      #     mountPath: /assistant
-      # - name: snips-nlu
-      #   image: zdock/snips-nlu:latest
-      #   - name: MQTT_HOST
-      #     value: "home-assistant-mosquitto"
-      #   - name: MQTT_PORT
-      #     value: "1883"
-      #   - name: MQTT_USERNAME
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: snips.mqtt.user
-      #         key: username
-      #   - name: MQTT_PASSWORD
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: snips.mqtt.user
-      #         key: password
-      #   volumeMounts:
-      #   - name: assistant
-      #     mountPath: /assistant
-      # - name: snips-dialogue
-      #   image: zdock/snips-dialogue:latest
-      #   - name: MQTT_HOST
-      #     value: "home-assistant-mosquitto"
-      #   - name: MQTT_PORT
-      #     value: "1883"
-      #   - name: MQTT_USERNAME
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: snips.mqtt.user
-      #         key: username
-      #   - name: MQTT_PASSWORD
-      #     valueFrom:
-      #       secretKeyRef:
-      #         name: snips.mqtt.user
-      #         key: password
-      #   volumeMounts:
-      #   - name: assistant
-      #     mountPath: /assistant
+      - name: snips-tts
+        image: zdock/snips-tts:latest
+        imagePullPolicy: Always
+        env:
+        - name: MQTT_HOST
+          value: "home-assistant-mosquitto"
+        - name: MQTT_PORT
+          value: "1883"
+        - name: MQTT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: snips.mqtt.user
+              key: username
+        - name: MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: snips.mqtt.user
+              key: password
+        volumeMounts:
+        - name: assistant
+          mountPath: /assistant
+      - name: snips-hotword
+        image: zdock/snips-hotword:latest
+        imagePullPolicy: Always
+        env:
+        - name: MQTT_HOST
+          value: "home-assistant-mosquitto"
+        - name: MQTT_PORT
+          value: "1883"
+        - name: MQTT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: snips.mqtt.user
+              key: username
+        - name: MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: snips.mqtt.user
+              key: password
+        volumeMounts:
+        - name: assistant
+          mountPath: /assistant
+      - name: snips-nlu
+        image: zdock/snips-nlu:latest
+        imagePullPolicy: Always
+        env:
+        - name: MQTT_HOST
+          value: "home-assistant-mosquitto"
+        - name: MQTT_PORT
+          value: "1883"
+        - name: MQTT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: snips.mqtt.user
+              key: username
+        - name: MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: snips.mqtt.user
+              key: password
+        volumeMounts:
+        - name: assistant
+          mountPath: /assistant
+      - name: snips-dialogue
+        image: zdock/snips-dialogue:latest
+        imagePullPolicy: Always
+        env:
+        - name: MQTT_HOST
+          value: "home-assistant-mosquitto"
+        - name: MQTT_PORT
+          value: "1883"
+        - name: MQTT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: snips.mqtt.user
+              key: username
+        - name: MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: snips.mqtt.user
+              key: password
+        volumeMounts:
+        - name: assistant
+          mountPath: /assistant

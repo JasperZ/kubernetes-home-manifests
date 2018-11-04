@@ -14,7 +14,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/mayan-edms/media
+    path: /mnt/datacenter_250GB/k8s/volumes/mayan-edms/media
     server: storage.zcc.x64.me
 ---
 

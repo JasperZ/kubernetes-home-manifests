@@ -18,7 +18,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/home-assistant/mosquitto/mosquitto/config
+    path: /mnt/datacenter_250GB/k8s/volumes/home-assistant/mosquitto/mosquitto/config
     server: storage.zcc.x64.me
 ---
 
@@ -40,7 +40,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/home-assistant/mosquitto/mosquitto/data
+    path: /mnt/datacenter_250GB/k8s/volumes/home-assistant/mosquitto/mosquitto/data
     server: storage.zcc.x64.me
 ---
 

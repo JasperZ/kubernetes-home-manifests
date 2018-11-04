@@ -18,7 +18,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_1tb/kubernetes/production/persistent_volumes_manual/urbackup/urbackup/backups
+    path: /mnt/datacenter_1tb/k8s/volumes/urbackup/urbackup/backups
     server: storage.zcc.x64.me
 ---
 
@@ -40,7 +40,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/urbackup/urbackup/database
+    path: /mnt/datacenter_250GB/k8s/volumes/urbackup/urbackup/database
     server: storage.zcc.x64.me
 ---
 

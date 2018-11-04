@@ -16,7 +16,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/unifi/unifi/config
+    path: /mnt/datacenter_250GB/k8s/volumes/unifi/unifi/config
     server: storage.zcc.x64.me
 ---
 

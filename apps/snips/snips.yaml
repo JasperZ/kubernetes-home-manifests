@@ -18,7 +18,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/snips/snips/assistant
+    path: /mnt/datacenter_250GB/k8s/volumes/snips/snips/assistant
     server: storage.zcc.x64.me
 ---
 

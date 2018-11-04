@@ -1,4 +1,4 @@
-/mnt/datacenter_250GB/k8s/volumes---
+---
 
 apiVersion: v1
 kind: PersistentVolume

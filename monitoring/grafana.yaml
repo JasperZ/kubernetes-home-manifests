@@ -1,0 +1,136 @@
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-grafana-data
+  labels:
+    app: prometheus
+    component: grafana
+    tier: storage
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/k8s/volumes/prometheus/grafana/data
+    server: storage.zcc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-grafana-data
+  namespace: monitoring
+  labels:
+    app: prometheus
+    component: grafana
+    tier: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: prometheus-grafana-data
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-grafana
+  namespace: monitoring
+  labels:
+    app: prometheus
+    component: grafana
+    tier: frontend
+spec:
+  selector:
+    app: prometheus
+    component: grafana
+    tier: frontend
+  ports:
+    - name: web-interface
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.221
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus-grafana
+  namespace: monitoring
+  labels:
+    app: prometheus
+    component: grafana
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+      component: grafana
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        component: grafana
+        tier: frontend
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: prometheus-grafana-data
+      containers:
+        - image: grafana/grafana:5.2.4
+          name: grafana
+          env:
+            - name: GF_DEFAULT_INSTANCE_NAME
+              value: "prometheus"
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: prometheus.grafana.admin
+                  key: username
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: prometheus.grafana.admin
+                  key: password
+            # - name: GF_SESSION_PROVIDER
+            #   value: "redis"
+            # - name: GF_SESSION_PROVIDER_CONFIG
+            #   value: "addr=localhost:6379,pool_size=100,prefix=grafana"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/grafana
+          ports:
+            - containerPort: 3000
+          # resources:
+          #   limits:
+          #     cpu: "500m"
+          #     memory: "512Mi"
+          #   requests:
+          #     cpu: "250m"
+          #     memory: "128Mi"
+        # - image: redis:4.0.11-alpine
+        #   name: redis
+        #   ports:
+        #     - containerPort: 6379
+        #   resources:
+        #     limits:
+        #       cpu: "250m"
+        #       memory: "256Mi"
+        #     requests:
+        #       cpu: "125m"
+        #       memory: "128Mi"

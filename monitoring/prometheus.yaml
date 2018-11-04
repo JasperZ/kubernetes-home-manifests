@@ -18,7 +18,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/prometheus/prometheus/data
+    path: /mnt/datacenter_250GB/k8s/volumes/prometheus/prometheus/data
     server: storage.zcc.x64.me
 ---
 

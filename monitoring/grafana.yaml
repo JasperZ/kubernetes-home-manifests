@@ -1,4 +1,4 @@
----
+/mnt/datacenter_250GB/k8s/volumes---
 
 apiVersion: v1
 kind: PersistentVolume
@@ -18,7 +18,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/persistent_volumes_manual/prometheus/grafana/data
+    path: /mnt/datacenter_250GB/k8s/volumes/prometheus/grafana/data
     server: storage.zcc.x64.me
 ---
 

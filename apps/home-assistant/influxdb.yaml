@@ -1,0 +1,131 @@
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: home-assistant-influxdb-data-pv
+  labels:
+    app: home-assistant
+    component: influxdb
+    tier: storage
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/k8s/volumes/home-assistant/influxdb/data
+    server: storage.zcc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: home-assistant-influxdb-data-pvc
+  labels:
+    app: home-assistant
+    component: influxdb
+    tier: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: home-assistant-influxdb-data-pv
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-assistant-influxdb
+  labels:
+    app: home-assistant
+    component: influxdb
+    tier: frontend
+spec:
+  selector:
+    app: home-assistant-influxdb
+  ports:
+    - name: http-api
+      protocol: TCP
+      port: 8086
+      targetPort: 8086
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: home-assistant-influxdb
+  name: home-assistant-influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: home-assistant-influxdb
+  template:
+    metadata:
+      labels:
+        app: home-assistant-influxdb
+    spec:
+      volumes:
+        - name: influxdb-data-volume
+          persistentVolumeClaim:
+            claimName: home-assistant-influxdb-data-pvc
+      containers:
+        - image: influxdb:1.7.0-alpine
+          name: home-assistant-influxdb
+          env:
+            - name: INFLUXDB_DB
+              value: "homeassistant"
+            - name: INFLUXDB_HTTP_AUTH_ENABLED
+              value: "true"
+            - name: INFLUXDB_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-influxdb-admin-user
+                  key: username
+            - name: INFLUXDB_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-influxdb-admin-user
+                  key: password
+            - name: INFLUXDB_WRITE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-influxdb-homeassistant-user
+                  key: username
+            - name: INFLUXDB_WRITE_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-influxdb-homeassistant-user
+                  key: password
+            - name: INFLUXDB_READ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-influxdb-grafana-user
+                  key: username
+            - name: INFLUXDB_READ_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-influxdb-grafana-user
+                  key: password
+          volumeMounts:
+            - name: influxdb-data-volume
+              mountPath: /var/lib/influxdb
+          ports:
+            - containerPort: 8083
+            - containerPort: 8086
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"

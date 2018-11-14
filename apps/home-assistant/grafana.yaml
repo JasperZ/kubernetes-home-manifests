@@ -1,0 +1,118 @@
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: home-assistant-grafana-data
+  labels:
+    app: home-assistant
+    component: grafana
+    tier: storage
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/k8s/volumes/home-assistant/grafana/data
+    server: storage.zcc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: home-assistant-grafana-data
+  labels:
+    app: home-assistant
+    component: grafana
+    tier: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: home-assistant-grafana-data
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-assistant-grafana
+  labels:
+    app: home-assistant
+    component: grafana
+    tier: frontend
+spec:
+  selector:
+    app: home-assistant
+    component: grafana
+    tier: frontend
+  ports:
+    - name: web-interface
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.225
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: home-assistant-grafana
+  labels:
+    app: home-assistant
+    component: grafana
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: home-assistant
+      component: grafana
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: home-assistant
+        component: grafana
+        tier: frontend
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: home-assistant-grafana-data
+      containers:
+        - image: grafana/grafana:5.3.4
+          name: grafana
+          env:
+            - name: GF_DEFAULT_INSTANCE_NAME
+              value: "home-assistant"
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant.grafana.admin
+                  key: username
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant.grafana.admin
+                  key: password
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/grafana
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"

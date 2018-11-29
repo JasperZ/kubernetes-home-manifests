@@ -88,7 +88,7 @@ spec:
           claimName: home-assistant-config
       containers:
       - name: home-assistant
-        image: homeassistant/home-assistant:0.82.1
+        image: homeassistant/home-assistant:0.83.0
         volumeMounts:
         - name: config
           mountPath: /config

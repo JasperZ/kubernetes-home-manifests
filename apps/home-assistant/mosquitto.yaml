@@ -98,10 +98,6 @@ spec:
     protocol: TCP
     port: 1883
     targetPort: 1883
-  - name: websocket
-    protocol: TCP
-    port: 8883
-    targetPort: 8883
   type: LoadBalancer
   loadBalancerIP: 192.168.1.241
 ---

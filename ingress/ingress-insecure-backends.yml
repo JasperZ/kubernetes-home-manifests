@@ -24,30 +24,6 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: mqtt-jz-c-org
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.org/websocket-services: "home-assistant-mosquitto"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-
-spec:
-  tls:
-  - hosts:
-    - mqtt.jz-c.org
-    secretName: mqtt.jz-c.org-tls
-  rules:
-  - host: mqtt.jz-c.org
-    http:
-      paths:
-      - backend:
-          serviceName: home-assistant-mosquitto
-          servicePort: 8883
----
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
   name: nextcloud-jz-c-org
   annotations:
     kubernetes.io/ingress.class: "nginx"

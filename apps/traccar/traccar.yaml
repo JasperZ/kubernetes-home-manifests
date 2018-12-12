@@ -1,0 +1,80 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: traccar
+  labels:
+    app: traccar
+    component: traccar
+    tier: frontend
+spec:
+  selector:
+    app: traccar
+    component: traccar
+    tier: frontend
+  ports:
+  - name: web-interface
+    protocol: TCP
+    port: 80
+    targetPort: 8082
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: traccar
+  labels:
+    app: traccar
+    component: traccar
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traccar
+      component: traccar
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: traccar
+        component: traccar
+        tier: frontend
+    spec:
+      # volumes:
+      # - name: config
+      #   persistentVolumeClaim:
+      #     claimName: home-assistant-config
+      containers:
+      - name: traccar
+        image: traccar/traccar:4.2-alpine
+        env:
+          - name: CONFIG_USE_ENVIRONMENT_VARIABLES
+            value: "True"
+          - name: DATABASE_DRIVER
+            value: "com.mysql.jdbc.Driver"
+          - name: DATABASE_URL
+            value: "jdbc:mysql://traccar-mariadb:3306/traccar"
+          - name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                name: traccar.mariadb.traccar
+                key: username
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: traccar.mariadb.traccar
+                key: password
+        # volumeMounts:
+        # - name: config
+        #   mountPath: /config
+        ports:
+        - containerPort: 8082
+        resources:
+          limits:
+            cpu: "250m"
+            memory: "512Mi"
+          requests:
+            cpu: "125m"
+            memory: "128Mi"

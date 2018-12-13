@@ -107,7 +107,7 @@ spec:
       port: 55415
       targetPort: 55415
   type: LoadBalancer
-  loadBalancerIP: 192.168.1.248
+  loadBalancerIP: 192.168.3.20
 ---
 
 apiVersion: apps/v1beta1

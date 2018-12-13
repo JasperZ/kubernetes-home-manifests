@@ -98,7 +98,7 @@ spec:
       port: 80
       targetPort: 8765
   type: LoadBalancer
-  loadBalancerIP: 192.168.1.249
+  loadBalancerIP: 192.168.3.12
 ---
 
 apiVersion: apps/v1beta1

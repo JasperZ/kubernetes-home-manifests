@@ -42,10 +42,10 @@ spec:
   ports:
     - name: web-interface
       protocol: TCP
-      port: 3000
+      port: 80
       targetPort: 3000
   type: LoadBalancer
-  loadBalancerIP: 192.168.1.244
+  loadBalancerIP: 192.168.3.16
 ---
 
 apiVersion: apps/v1beta1

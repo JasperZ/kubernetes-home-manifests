@@ -229,10 +229,6 @@ metadata:
 data:
   config: |
     address-pools:
-    - name: shared-ip-space
-      protocol: layer2
-      addresses:
-      - 192.168.1.220-192.168.1.250
     - name: full-ip-space
       protocol: bgp
       avoid-buggy-ips: true

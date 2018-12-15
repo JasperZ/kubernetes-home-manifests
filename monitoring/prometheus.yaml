@@ -351,7 +351,7 @@ spec:
       port: 9090
       targetPort: 9090
   type: LoadBalancer
-  loadBalancerIP: 192.168.3.19
+  loadBalancerIP: 192.168.1.220
 ---
 
 apiVersion: extensions/v1beta1

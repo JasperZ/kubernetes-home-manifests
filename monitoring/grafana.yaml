@@ -64,7 +64,7 @@ spec:
   loadBalancerIP: 192.168.1.221
 ---
 
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus-grafana

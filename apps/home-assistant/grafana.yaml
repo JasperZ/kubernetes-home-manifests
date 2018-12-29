@@ -88,6 +88,10 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: home-assistant-grafana-data
+      initContainers:
+      - name: init-influxdb
+        image: appropriate/curl
+        command: ["sh", "-c", "until curl -sL -I home-assistant-influxdb:8086/ping; do echo waiting for home-assistant-influxdb; sleep 2; done;"]
       containers:
         - image: grafana/grafana:5.3.4
           name: grafana

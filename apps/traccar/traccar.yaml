@@ -42,33 +42,41 @@ spec:
         component: traccar
         tier: frontend
     spec:
-      # volumes:
-      # - name: config
-      #   persistentVolumeClaim:
-      #     claimName: home-assistant-config
+      initContainers:
+      - name: init-mariadb
+        image: mariadb
+        command: ["sh", "-c", "until mysql -h traccar-mariadb -u $DATABASE_USER --password=$DATABASE_PASSWORD -e 'SELECT 1'; do echo waiting for traccar-mariadb; sleep 2; done;"]
+        env:
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: traccar.mariadb.traccar
+              key: username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: traccar.mariadb.traccar
+              key: password
       containers:
       - name: traccar
         image: traccar/traccar:4.2-alpine
         env:
-          - name: CONFIG_USE_ENVIRONMENT_VARIABLES
-            value: "True"
-          - name: DATABASE_DRIVER
-            value: "com.mysql.jdbc.Driver"
-          - name: DATABASE_URL
-            value: "jdbc:mysql://traccar-mariadb:3306/traccar"
-          - name: DATABASE_USER
-            valueFrom:
-              secretKeyRef:
-                name: traccar.mariadb.traccar
-                key: username
-          - name: DATABASE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: traccar.mariadb.traccar
-                key: password
-        # volumeMounts:
-        # - name: config
-        #   mountPath: /config
+        - name: CONFIG_USE_ENVIRONMENT_VARIABLES
+          value: "True"
+        - name: DATABASE_DRIVER
+          value: "com.mysql.jdbc.Driver"
+        - name: DATABASE_URL
+          value: "jdbc:mysql://traccar-mariadb:3306/traccar"
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: traccar.mariadb.traccar
+              key: username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: traccar.mariadb.traccar
+              key: password
         ports:
         - containerPort: 8082
         resources:

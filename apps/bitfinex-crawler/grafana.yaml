@@ -68,6 +68,10 @@ spec:
         - name: grafana-data-volume
           persistentVolumeClaim:
             claimName: bitfinex-crawler-grafana-data-pvc
+      initContainers:
+      - name: init-influxdb
+        image: appropriate/curl
+        command: ["sh", "-c", "until curl -sL -I bitfinex-crawler-influxdb:8086/ping; do echo waiting for bitfinex-crawler-influxdb; sleep 2; done;"]
       containers:
         - image: grafana/grafana:5.0.1
           name: bitfinex-crawler-grafana

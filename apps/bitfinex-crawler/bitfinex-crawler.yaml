@@ -16,6 +16,10 @@ spec:
       labels:
         app: bitfinex-crawler
     spec:
+      initContainers:
+      - name: init-influxdb
+        image: appropriate/curl
+        command: ["sh", "-c", "until curl -sL -I bitfinex-crawler-influxdb:8086/ping; do echo waiting for bitfinex-crawler-influxdb; sleep 2; done;"]
       containers:
         - name: bitfinex-crawler
           image: zdock/bitfinex-crawler:latest

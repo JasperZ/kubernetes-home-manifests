@@ -125,7 +125,7 @@ spec:
             requests:
               cpu: "125m"
               memory: "128Mi"
-        # CREATE USER 'prometheus'@'%' IDENTIFIED BY 'PASSWORD' WITH MAX_USER_CONNECTIONS 3;
+        # CREATE USER IF NOT EXISTS 'prometheus'@'%' IDENTIFIED BY 'PASSWORD' WITH MAX_USER_CONNECTIONS 3;
         # GRANT PROCESS, REPLICATION CLIENT ON *.* TO 'prometheus'@'%';
         # GRANT SELECT ON performance_schema.* TO 'prometheus'@'%';
         - name: mysqld-exporter

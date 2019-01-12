@@ -94,7 +94,7 @@ spec:
           claimName: home-assistant-esphomeyaml
       containers:
       - name: home-assistant
-        image: ottowinter/esphomeyaml:v1.9.3
+        image: ottowinter/esphomeyaml:v1.10.0
         volumeMounts:
         - name: config
           mountPath: /config

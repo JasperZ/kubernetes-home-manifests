@@ -88,7 +88,7 @@ spec:
           claimName: home-assistant-config
       initContainers:
       - name: init-mariadb
-        image: mariadb
+        image: mariadb:10.4.1-bionic
         command: ["sh", "-c", "until mysql -h home-assistant-mariadb -u $DATABASE_USER --password=$DATABASE_PASSWORD -e 'SELECT 1'; do echo waiting for home-assistant-mariadb; sleep 2; done;"]
         env:
         - name: DATABASE_USER

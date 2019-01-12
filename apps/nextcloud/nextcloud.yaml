@@ -286,7 +286,7 @@ spec:
             claimName: nextcloud-data
       initContainers:
       - name: init-mariadb
-        image: mariadb
+        image: mariadb:10.4.1-bionic
         command: ["sh", "-c", "until mysql -h nextcloud-mariadb -u $DATABASE_USER --password=$DATABASE_PASSWORD -e 'SELECT 1'; do echo waiting for nextcloud-mariadb; sleep 2; done;"]
         env:
         - name: DATABASE_USER

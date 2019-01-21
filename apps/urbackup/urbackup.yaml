@@ -107,6 +107,7 @@ spec:
       port: 55415
       targetPort: 55415
   type: LoadBalancer
+  externalTrafficPolicy: Local
   loadBalancerIP: 192.168.1.248
 ---
 

@@ -229,7 +229,13 @@ metadata:
 data:
   config: |
     address-pools:
-    - name: my-ip-space
-      protocol: layer2
+    - name: bgp-pool
+      protocol: bgp
       addresses:
+      - 192.168.200.100-192.168.200.200
       - 192.168.1.220-192.168.1.250
+
+    peers:
+    - my-asn: 64512
+      peer-asn: 65530
+      peer-address: 192.168.1.1

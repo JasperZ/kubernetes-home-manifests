@@ -103,6 +103,7 @@ spec:
       port: 9982
       targetPort: 9982
   type: LoadBalancer
+  externalTrafficPolicy: Local
   loadBalancerIP: 192.168.1.221
 ---
 

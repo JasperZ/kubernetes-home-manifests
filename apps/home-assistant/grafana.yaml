@@ -59,6 +59,7 @@ spec:
       port: 80
       targetPort: 3000
   type: LoadBalancer
+  externalTrafficPolicy: Local
   loadBalancerIP: 192.168.1.225
 ---
 

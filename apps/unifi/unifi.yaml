@@ -75,6 +75,7 @@ spec:
     port: 6789
     targetPort: 6789
   type: LoadBalancer
+  externalTrafficPolicy: Local
   loadBalancerIP: 192.168.1.243
 
 ---
@@ -103,6 +104,7 @@ spec:
     port: 10001
     targetPort: 10001
   type: LoadBalancer
+  externalTrafficPolicy: Local
   loadBalancerIP: 192.168.1.243
 
 ---

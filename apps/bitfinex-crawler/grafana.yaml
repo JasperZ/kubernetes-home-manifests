@@ -46,7 +46,7 @@ spec:
       targetPort: 3000
   type: LoadBalancer
   externalTrafficPolicy: Local
-  loadBalancerIP: 192.168.1.244
+  loadBalancerIP: 192.168.70.12
 ---
 
 apiVersion: apps/v1

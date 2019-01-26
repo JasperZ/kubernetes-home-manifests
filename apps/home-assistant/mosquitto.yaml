@@ -100,7 +100,7 @@ spec:
     targetPort: 1883
   type: LoadBalancer
   externalTrafficPolicy: Local
-  loadBalancerIP: 192.168.1.241
+  loadBalancerIP: 192.168.70.4
 ---
 
 apiVersion: apps/v1

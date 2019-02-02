@@ -74,7 +74,7 @@ spec:
           persistentVolumeClaim:
             claimName: bitfinex-crawler-influxdb-data-pvc
       containers:
-        - image: influxdb:1.5.0-alpine
+        - image: influxdb:1.7.3-alpine
           name: bitfinex-crawler-influxdb
           env:
             - name: INFLUXDB_DB

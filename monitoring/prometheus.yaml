@@ -268,10 +268,6 @@ data:
           regex: prometheus-server
           action: drop
 
-        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-          regex: \/snmp
-          action: drop
-
       # weave
       - job_name: 'weave'
         kubernetes_sd_configs:

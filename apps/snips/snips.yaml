@@ -68,7 +68,7 @@ spec:
           claimName: snips-assistant
       containers:
       - name: snips-asr
-        image: zdock/snips-asr:latest
+        image: zdock/snips-asr:0.61.1
         imagePullPolicy: Always
         env:
         - name: MQTT_HOST
@@ -89,7 +89,7 @@ spec:
         - name: assistant
           mountPath: /assistant
       - name: snips-tts
-        image: zdock/snips-tts:latest
+        image: zdock/snips-tts:0.61.1
         imagePullPolicy: Always
         env:
         - name: MQTT_HOST
@@ -110,7 +110,7 @@ spec:
         - name: assistant
           mountPath: /assistant
       - name: snips-hotword
-        image: zdock/snips-hotword:latest
+        image: zdock/snips-hotword:0.61.1
         imagePullPolicy: Always
         env:
         - name: MQTT_HOST
@@ -131,7 +131,7 @@ spec:
         - name: assistant
           mountPath: /assistant
       - name: snips-nlu
-        image: zdock/snips-nlu:latest
+        image: zdock/snips-nlu:0.61.1
         imagePullPolicy: Always
         env:
         - name: MQTT_HOST
@@ -152,7 +152,7 @@ spec:
         - name: assistant
           mountPath: /assistant
       - name: snips-dialogue
-        image: zdock/snips-dialogue:latest
+        image: zdock/snips-dialogue:0.61.1
         imagePullPolicy: Always
         env:
         - name: MQTT_HOST

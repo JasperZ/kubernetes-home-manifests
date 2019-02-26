@@ -164,6 +164,8 @@ items:
             - name: weave
               command:
                 - /home/weave/launch.sh
+              args:
+                - --no-masq-local=true
               env:
                 - name: HOSTNAME
                   valueFrom:

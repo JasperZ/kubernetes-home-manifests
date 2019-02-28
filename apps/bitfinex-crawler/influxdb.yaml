@@ -84,33 +84,33 @@ spec:
             - name: INFLUXDB_ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: bitfinex-crawler-influxdb-admin-user
-                  key: username
+                  name: bitfinex-crawler.influxdb
+                  key: admin-username
             - name: INFLUXDB_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: bitfinex-crawler-influxdb-admin-user
-                  key: password
+                  name: bitfinex-crawler.influxdb
+                  key: admin-password
             - name: INFLUXDB_WRITE_USER
               valueFrom:
                 secretKeyRef:
-                  name: bitfinex-crawler-influxdb-write-user
-                  key: username
+                  name: bitfinex-crawler.influxdb
+                  key: write-username
             - name: INFLUXDB_WRITE_USER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: bitfinex-crawler-influxdb-write-user
-                  key: password
+                  name: bitfinex-crawler.influxdb
+                  key: write-password
             - name: INFLUXDB_READ_USER
               valueFrom:
                 secretKeyRef:
-                  name: bitfinex-crawler-influxdb-read-user
-                  key: username
+                  name: bitfinex-crawler.influxdb
+                  key: read-username
             - name: INFLUXDB_READ_USER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: bitfinex-crawler-influxdb-read-user
-                  key: password
+                  name: bitfinex-crawler.influxdb
+                  key: read-password
           volumeMounts:
             - name: influxdb-data-volume
               mountPath: /var/lib/influxdb

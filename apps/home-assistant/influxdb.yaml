@@ -89,33 +89,33 @@ spec:
             - name: INFLUXDB_ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: home-assistant-influxdb-admin-user
-                  key: username
+                  name: home-assistant.influxdb
+                  key: admin-username
             - name: INFLUXDB_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: home-assistant-influxdb-admin-user
-                  key: password
+                  name: home-assistant.influxdb
+                  key: admin-password
             - name: INFLUXDB_WRITE_USER
               valueFrom:
                 secretKeyRef:
-                  name: home-assistant-influxdb-homeassistant-user
-                  key: username
+                  name: home-assistant.influxdb
+                  key: homeassistant-username
             - name: INFLUXDB_WRITE_USER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: home-assistant-influxdb-homeassistant-user
-                  key: password
+                  name: home-assistant.influxdb
+                  key: homeassistant-password
             - name: INFLUXDB_READ_USER
               valueFrom:
                 secretKeyRef:
-                  name: home-assistant-influxdb-grafana-user
-                  key: username
+                  name: home-assistant.influxdb
+                  key: grafana-username
             - name: INFLUXDB_READ_USER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: home-assistant-influxdb-grafana-user
-                  key: password
+                  name: home-assistant.influxdb
+                  key: grafana-password
           volumeMounts:
             - name: influxdb-data-volume
               mountPath: /var/lib/influxdb

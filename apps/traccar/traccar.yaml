@@ -50,13 +50,13 @@ spec:
         - name: DATABASE_USER
           valueFrom:
             secretKeyRef:
-              name: traccar.mariadb.traccar
-              key: username
+              name: traccar.mariadb
+              key: traccar-username
         - name: DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: traccar.mariadb.traccar
-              key: password
+              name: traccar.mariadb
+              key: traccar-password
       containers:
       - name: traccar
         image: traccar/traccar:4.2-alpine
@@ -70,13 +70,13 @@ spec:
         - name: DATABASE_USER
           valueFrom:
             secretKeyRef:
-              name: traccar.mariadb.traccar
-              key: username
+              name: traccar.mariadb
+              key: traccar-username
         - name: DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: traccar.mariadb.traccar
-              key: password
+              name: traccar.mariadb
+              key: traccar-password
         ports:
         - containerPort: 8082
         resources:

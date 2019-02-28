@@ -99,20 +99,17 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: home-assistant-mariadb-root-user
-                  key: password
+                  name: home-assistant.mariadb
+                  key: root-password
             - name: MYSQL_DATABASE
               value: homeassistant
             - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: home-assistant-mariadb-homeassistant-user
-                  key: username
+              value: "homeassistant"
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: home-assistant-mariadb-homeassistant-user
-                  key: password
+                  name: home-assistant.mariadb
+                  key: homeassistant-password
           volumeMounts:
             - name: data
               mountPath: /var/lib/mysql

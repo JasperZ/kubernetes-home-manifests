@@ -80,8 +80,8 @@ spec:
             - name: GF_SECURITY_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: dashboards.grafana.admin
-                  key: password
+                  name: dashboards.grafana
+                  key: admin-password
           volumeMounts:
             - name: data
               mountPath: /var/lib/grafana

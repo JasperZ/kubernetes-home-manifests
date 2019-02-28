@@ -97,20 +97,17 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: nextcloud-mariadb-root-user
-                  key: password
+                  name: nextcloud.mariadb
+                  key: root-password
             - name: MYSQL_DATABASE
               value: nextcloud
             - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: nextcloud-mariadb-nextcloud-user
-                  key: username
+              value: "nextcloud"
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: nextcloud-mariadb-nextcloud-user
-                  key: password
+                  name: nextcloud.mariadb
+                  key: nextcloud-password
           volumeMounts:
             - name: data
               mountPath: /var/lib/mysql

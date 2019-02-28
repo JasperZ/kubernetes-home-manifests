@@ -34,13 +34,13 @@ spec:
             - name: INFLUXDB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: bitfinex-crawler-influxdb-write-user
-                  key: username
+                  name: bitfinex-crawler.influxdb
+                  key: write-username
             - name: INFLUXDB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: bitfinex-crawler-influxdb-write-user
-                  key: password
+                  name: bitfinex-crawler.influxdb
+                  key: write-password
           resources:
             limits:
               cpu: "500m"

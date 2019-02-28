@@ -89,20 +89,20 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: traccar.mariadb.root
-                  key: password
+                  name: traccar.mariadb
+                  key: root-password
             - name: MYSQL_DATABASE
               value: traccar
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: traccar.mariadb.traccar
-                  key: username
+                  name: traccar.mariadb
+                  key: traccar-username
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: traccar.mariadb.traccar
-                  key: password
+                  name: traccar.mariadb
+                  key: traccar-password
           volumeMounts:
             - name: data
               mountPath: /var/lib/mysql

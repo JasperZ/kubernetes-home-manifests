@@ -92,6 +92,8 @@ spec:
           env:
             - name: DOMAIN
               value: https://bitwarden.jz-c.org
+            - name: SIGNUPS_ALLOWED
+              value: "false"
           volumeMounts:
             - name: data
               mountPath: /data

@@ -1,7 +1,7 @@
 This repository contains my personal kubernetes manifests written in yaml.
 
 ## Applications
-- [bitfinex-crawler
+- bitfinex-crawler
 - bitwarden
 - ddclient
 - gogs

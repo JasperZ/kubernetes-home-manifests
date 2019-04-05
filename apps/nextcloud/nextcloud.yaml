@@ -317,9 +317,15 @@ spec:
           - name: NEXTCLOUD_TABLE_PREFIX
             value: "oc_"
           - name: NEXTCLOUD_ADMIN_USER
-            value: admin
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud
+                key: admin-username
           - name: NEXTCLOUD_ADMIN_PASSWORD
-            value: "75J)Fb.a"
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud
+                key: admin-password
         volumeMounts:
           - name: php-fpm
             mountPath: /usr/local/etc/php-fpm.d/www.conf
@@ -544,9 +550,15 @@ spec:
 #           - name: NEXTCLOUD_TABLE_PREFIX
 #             value: "oc_"
 #           - name: NEXTCLOUD_ADMIN_USER
-#             value: admin
+#             valueFrom:
+#               secretKeyRef:
+#               name: nextcloud
+#               key: admin-username
 #           - name: NEXTCLOUD_ADMIN_PASSWORD
-#             value: "75J)Fb.a"
+#             valueFrom:
+#               secretKeyRef:
+#                 name: nextcloud
+#                 key: admin-password
 #         volumeMounts:
 #           - name: nextcloud-html-volume
 #             mountPath: /var/www/html

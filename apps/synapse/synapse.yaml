@@ -1,0 +1,144 @@
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: synapse-data
+  labels:
+    app: synapse
+    component: synapse
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/k8s/volumes/synapse/synapse/data
+    server: storage.zcc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: synapse-data
+  labels:
+    app: synapse
+    component: synapse
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: synapse-data
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: synapse
+  labels:
+    app: synapse
+    component: synapse
+spec:
+  selector:
+    app: synapse
+    component: synapse
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8008
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: synapse
+  labels:
+    app: synapse
+    component: synapse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: synapse
+      component: synapse
+  template:
+    metadata:
+      labels:
+        app: synapse
+        component: synapse
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: synapse-data
+      initContainers:
+      - name: init-postgresql
+        image: postgres:11.2-alpine
+        command: ["sh", "-c", "until psql -h synapse-postgresql -U $POSTGRES_USER -c 'SELECT 1' synapse; do echo waiting for synapse-postgresql; sleep 2; done;"]
+        env:
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: synapse.postgresql
+                key: synapse-password
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: synapse.postgresql
+                key: synapse-username
+      containers:
+      - image: matrixdotorg/synapse:v0.99.3-py3
+        name: synapse
+        env:
+          - name: SYNAPSE_SERVER_NAME
+            value: matrix.jz-c.org
+          - name: SYNAPSE_REPORT_STATS
+            value: "yes"
+          - name: SYNAPSE_NO_TLS
+            value: "1"
+          - name: SYNAPSE_MAX_UPLOAD_SIZE
+            value: "50M"
+          - name: SYNAPSE_REGISTRATION_SHARED_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: synapse
+                key: registration-shared-secret
+          - name: SYNAPSE_MACAROON_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: synapse
+                key: macaroon-secret-key
+          - name: POSTGRES_DB
+            value: "synapse"
+          - name: POSTGRES_HOST
+            value: "synapse-postgresql"
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: synapse.postgresql
+                key: synapse-password
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: synapse.postgresql
+                key: synapse-username
+        volumeMounts:
+          - name: data
+            mountPath: /data
+        ports:
+          - containerPort: 8008
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

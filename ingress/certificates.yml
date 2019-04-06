@@ -98,26 +98,46 @@ spec:
         ingressClass: nginx
       domains:
       - home-assistant.jz-c.org
+# ---
+#
+# apiVersion: certmanager.k8s.io/v1alpha1
+# kind: Certificate
+# metadata:
+#   name: traccar.jz-c.org-cert
+#   namespace: default
+# spec:
+#   secretName: traccar.jz-c.org-tls
+#   issuerRef:
+#     name: letsencrypt-production-issuer
+#   commonName: traccar.jz-c.org
+#   dnsNames:
+#   - traccar.jz-c.org
+#   acme:
+#     config:
+#     - http01:
+#         ingressClass: nginx
+#       domains:
+#       - traccar.jz-c.org
 ---
 
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: traccar.jz-c.org-cert
+  name: matrix.jz-c.org-cert
   namespace: default
 spec:
-  secretName: traccar.jz-c.org-tls
+  secretName: matrix.jz-c.org-tls
   issuerRef:
     name: letsencrypt-production-issuer
-  commonName: traccar.jz-c.org
+  commonName: matrix.jz-c.org
   dnsNames:
-  - traccar.jz-c.org
+  - matrix.jz-c.org
   acme:
     config:
     - http01:
         ingressClass: nginx
       domains:
-      - traccar.jz-c.org
+      - matrix.jz-c.org
 ---
 
 apiVersion: certmanager.k8s.io/v1alpha1

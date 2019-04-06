@@ -1,0 +1,128 @@
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: synapse-postgresql-data
+  labels:
+    app: synapse
+    component: postgresql
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=3
+  nfs:
+    path: /mnt/datacenter_250GB/k8s/volumes/synapse/postgresql/data
+    server: storage.zcc.x64.me
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: synapse-postgresql-data
+  labels:
+    app: synapse
+    component: postgresql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: synapse-postgresql-data
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: synapse-postgresql
+  labels:
+    app: synapse
+    component: postgresql
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path: /metrics
+    prometheus.io/port: '9104'
+spec:
+  selector:
+    app: synapse
+    component: postgresql
+  ports:
+    - name: mariadb
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: synapse-postgresql
+  labels:
+    app: synapse
+    component: postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: synapse
+      component: postgresql
+  template:
+    metadata:
+      labels:
+        app: synapse
+        component: postgresql
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: synapse-postgresql-data
+      containers:
+        - name: postgresql
+          image: postgres:11.2-alpine
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: synapse.postgresql
+                  key: synapse-password
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: synapse.postgresql
+                  key: synapse-username
+            - name: POSTGRES_DB
+              value: "synapse"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data/pgdata
+          ports:
+            - containerPort: 5432
+          resources:
+            limits:
+              cpu: "250m"
+              memory: "512Mi"
+            requests:
+              cpu: "125m"
+              memory: "128Mi"
+        # CREATE USER 'prometheus'@'%' IDENTIFIED BY 'PASSWORD' WITH MAX_USER_CONNECTIONS 3;
+        # GRANT PROCESS, REPLICATION CLIENT ON *.* TO 'prometheus'@'%';
+        # GRANT SELECT ON performance_schema.* TO 'prometheus'@'%';
+        # - name: mysqld-exporter
+        #   image: prom/mysqld-exporter:v0.11.0
+        #   env:
+        #     - name: DATA_SOURCE_NAME
+        #       valueFrom:
+        #         secretKeyRef:
+        #           name: prometheus.mysql-exporter.data-source-name
+        #           key: data-source-name
+        #   ports:
+        #     - containerPort: 9104

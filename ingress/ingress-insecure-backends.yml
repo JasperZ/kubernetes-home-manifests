@@ -103,27 +103,27 @@ spec:
 #       - backend:
 #           serviceName: traccar
 #           servicePort: 80
----
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: office-jz-c-org
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/proxy-body-size: "16G"
-spec:
-  tls:
-  - hosts:
-    - office.jz-c.org
-    secretName: office.jz-c.org-tls
-  rules:
-  - host: office.jz-c.org
-    http:
-      paths:
-      - backend:
-          serviceName: nextcloud-collabora
-          servicePort: 80
+# ---
+#
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: office-jz-c-org
+#   annotations:
+#     kubernetes.io/ingress.class: "nginx"
+#     nginx.ingress.kubernetes.io/proxy-body-size: "16G"
+# spec:
+#   tls:
+#   - hosts:
+#     - office.jz-c.org
+#     secretName: office.jz-c.org-tls
+#   rules:
+#   - host: office.jz-c.org
+#     http:
+#       paths:
+#       - backend:
+#           serviceName: nextcloud-collabora
+#           servicePort: 80
 # ---
 #
 # apiVersion: extensions/v1beta1

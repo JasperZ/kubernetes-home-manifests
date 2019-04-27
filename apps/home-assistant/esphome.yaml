@@ -95,7 +95,7 @@ spec:
           claimName: home-assistant-esphome
       containers:
       - name: home-assistant
-        image: esphome/esphome:1.11.2
+        image: esphome/esphome:1.12.2
         volumeMounts:
         - name: config
           mountPath: /config

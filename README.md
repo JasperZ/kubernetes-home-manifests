@@ -16,7 +16,6 @@ This repository contains my personal kubernetes manifests written in yaml.
 - tvheadend
 - unifi
 - urbackup
-- synapse (Matrix homeserver implementation)
 
 ## Ingress
 - NGINX ingress

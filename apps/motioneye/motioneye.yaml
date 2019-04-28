@@ -132,7 +132,7 @@ spec:
           persistentVolumeClaim:
             claimName: motioneye-config
       containers:
-        - image: ccrisan/motioneye:0.39.3-amd64
+        - image: ccrisan/motioneye:0.40-amd64
           name: motioneye
           env:
             - name: TIMEZONE

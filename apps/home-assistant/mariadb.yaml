@@ -91,7 +91,7 @@ spec:
             claimName: home-assistant-mariadb
       containers:
         - name: mariadb
-          image: mariadb:10.3
+          image: mariadb:10.4.4-bionic
           args:
             - --character-set-server=utf8mb4
             - --collation-server=utf8mb4_unicode_ci

@@ -92,7 +92,7 @@ spec:
             claimName: nextcloud-mariadb-data
       containers:
         - name: mariadb
-          image: mariadb:10.3.6
+          image: mariadb:10.4.4-bionic
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:

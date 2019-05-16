@@ -103,7 +103,7 @@ spec:
         command: ["sh", "-c", "until curl -sL -I home-assistant-influxdb:8086/ping; do echo waiting for home-assistant-influxdb; sleep 2; done;"]
       containers:
       - name: home-assistant
-        image: homeassistant/home-assistant:0.92.2
+        image: homeassistant/home-assistant:0.93.0
         volumeMounts:
         - name: config
           mountPath: /config

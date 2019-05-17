@@ -300,7 +300,7 @@ spec:
         image: redis
         command: ["sh", "-c", "until redis-cli -h nextcloud-redis -p 6379 ping; do echo waiting for nextcloud-redis; sleep 2; done;"]
       containers:
-      - image: nextcloud:16.0.0-fpm
+      - image: nextcloud:16.0.1-fpm
         name: nextcloud
         env:
           - name: MYSQL_DATABASE
@@ -392,7 +392,7 @@ spec:
                 claimName: nextcloud-data
           containers:
           - name: nextcloud-cron
-            image: nextcloud:16.0.0-fpm
+            image: nextcloud:16.0.1-fpm
             command: ["php"]
             args:
               - -f
@@ -447,7 +447,7 @@ spec:
 #                 claimName: nextcloud-data
 #           containers:
 #           - name: nextcloud-preview-cron
-#             image: nextcloud:16.0.0-fpm
+#             image: nextcloud:16.0.1-fpm
 #             command: ["php"]
 #             args:
 #               - /var/www/html/occ
@@ -490,7 +490,7 @@ spec:
 #             claimName: nextcloud-data
 #       containers:
 #       - name: nextcloud-preview-cron
-#         image: nextcloud:16.0.0-fpm
+#         image: nextcloud:16.0.1-fpm
 #         command: ["php"]
 #         args:
 #           - /var/www/html/occ
@@ -533,7 +533,7 @@ spec:
 #             claimName: nextcloud-data-pvc
 #       containers:
 #       - name: nextcloud-preview-cron
-#         image: nextcloud:16.0.0-fpm
+#         image: nextcloud:16.0.1-fpm
 #         command: ["php"]
 #         args:
 #           - /var/www/html/occ

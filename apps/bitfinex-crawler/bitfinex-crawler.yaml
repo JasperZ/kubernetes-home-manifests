@@ -22,7 +22,7 @@ spec:
         command: ["sh", "-c", "until curl -sL -I bitfinex-crawler-influxdb:8086/ping; do echo waiting for bitfinex-crawler-influxdb; sleep 2; done;"]
       containers:
         - name: bitfinex-crawler
-          image: zdock/bitfinex-crawler:0.10.1
+          image: zdock/bitfinex-crawler:0.10.2
           imagePullPolicy: Always
           env:
             - name: TICKER_SYMBOLS

@@ -87,7 +87,7 @@ spec:
           persistentVolumeClaim:
             claimName: bitwarden-data
       containers:
-        - image: mprasil/bitwarden:1.9.0-alpine
+        - image: mprasil/bitwarden:1.9.1-alpine
           name: bitwarden
           env:
             - name: DOMAIN

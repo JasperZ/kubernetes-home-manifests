@@ -85,6 +85,9 @@ spec:
       containers:
       - name: node-red
         image: nodered/node-red-docker:0.20.5-v8
+        env:
+        - name: TZ
+          value: "Europe/Berlin"
         volumeMounts:
         - name: data
           mountPath: /data

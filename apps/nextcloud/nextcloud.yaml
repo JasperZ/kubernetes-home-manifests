@@ -40,7 +40,7 @@ spec:
   mountOptions:
     - nfsvers=3
   nfs:
-    path: /mnt/datacenter_1tb/k8s/volumes/nextcloud/nextcloud/data
+    path: /mnt/datacenter_4TB/k8s/volumes/nextcloud/nextcloud/data
     server: storage.zcc.x64.me
 ---
 

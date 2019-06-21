@@ -341,8 +341,8 @@ spec:
             memory: "128Mi"
             cpu: "250m"
           limits:
-            memory: "512Mi"
-            cpu: "1"
+            memory: "2Gi"
+            cpu: "2"
       - image: nginx:1.14.0-alpine
         name: nginx
         volumeMounts:
@@ -356,7 +356,7 @@ spec:
         resources:
           limits:
             cpu: "500m"
-            memory: "1Gi"
+            memory: "512Mi"
           requests:
             cpu: "125m"
             memory: "256Mi"

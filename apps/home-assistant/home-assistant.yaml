@@ -103,7 +103,7 @@ spec:
         command: ["sh", "-c", "until curl -sL -I home-assistant-influxdb:8086/ping; do echo waiting for home-assistant-influxdb; sleep 2; done;"]
       containers:
       - name: home-assistant
-        image: homeassistant/home-assistant:0.94.3
+        image: homeassistant/home-assistant:0.94.4
         volumeMounts:
         - name: config
           mountPath: /config
@@ -111,8 +111,8 @@ spec:
         - containerPort: 8123
         resources:
           limits:
-            cpu: "250m"
-            memory: "256Mi"
+            cpu: "500m"
+            memory: "500Mi"
           requests:
             cpu: "125m"
             memory: "128Mi"

@@ -49,6 +49,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/proxy-body-size: "16G"
+    nginx.org/websocket-services: "bitwarden-websocket"
 spec:
   tls:
   - hosts:
@@ -58,9 +59,18 @@ spec:
   - host: bitwarden.jz-c.org
     http:
       paths:
-      - backend:
+      - path: /
+        backend:
           serviceName: bitwarden
           servicePort: 80
+      - path: /notifications/hub/negotiate
+        backend:
+          serviceName: bitwarden
+          servicePort: 80
+      - path: /notifications/hub
+        backend:
+          serviceName: bitwarden-websocket
+          servicePort: 3012
 ---
 
 apiVersion: extensions/v1beta1

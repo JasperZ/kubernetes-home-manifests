@@ -54,10 +54,30 @@ spec:
     component: bitwarden
     tier: frontend
   ports:
-    - name: php-fpm
+    - name: http
       protocol: TCP
       port: 80
       targetPort: 80
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bitwarden-websocket
+  labels:
+    app: bitwarden
+    component: bitwarden
+    tier: frontend
+spec:
+  selector:
+    app: bitwarden
+    component: bitwarden
+    tier: frontend
+  ports:
+    - name: websocket
+      protocol: TCP
+      port: 3012
+      targetPort: 3012
 ---
 
 apiVersion: apps/v1
@@ -94,11 +114,14 @@ spec:
               value: https://bitwarden.jz-c.org
             - name: SIGNUPS_ALLOWED
               value: "false"
+            - name: WEBSOCKET_ENABLED
+              value: "true"
           volumeMounts:
             - name: data
               mountPath: /data
           ports:
             - containerPort: 80
+            - containerPort: 3012
           resources:
             requests:
               memory: "128Mi"

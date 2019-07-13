@@ -86,21 +86,6 @@ spec:
       - name: config
         persistentVolumeClaim:
           claimName: home-assistant-config
-      initContainers:
-      - name: init-mariadb
-        image: mariadb:10.4.4-bionic
-        command: ["sh", "-c", "until mysql -h home-assistant-mariadb -u $DATABASE_USER --password=$DATABASE_PASSWORD -e 'SELECT 1'; do echo waiting for home-assistant-mariadb; sleep 2; done;"]
-        env:
-        - name: DATABASE_USER
-          value: "homeassistant"
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: home-assistant.mariadb
-              key: homeassistant-password
-      - name: init-influxdb
-        image: appropriate/curl
-        command: ["sh", "-c", "until curl -sL -I home-assistant-influxdb:8086/ping; do echo waiting for home-assistant-influxdb; sleep 2; done;"]
       containers:
       - name: home-assistant
         image: homeassistant/home-assistant:0.95.4

@@ -86,6 +86,10 @@ spec:
       - name: config
         persistentVolumeClaim:
           claimName: home-assistant-config
+      initContainers:
+      - name: init-influxdb
+        image: appropriate/curl
+        command: ["sh", "-c", "until curl -sL -I home-assistant-influxdb:8086/ping; do echo waiting for home-assistant-influxdb; sleep 2; done;"]
       containers:
       - name: home-assistant
         image: homeassistant/home-assistant:0.95.4

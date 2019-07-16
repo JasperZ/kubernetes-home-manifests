@@ -1,0 +1,8 @@
+bases:
+  - ../../../components/redis
+commonLabels:
+  component: redis
+images:
+- name: redis
+  newName: redis
+  newTag: 5.0.5-alpine

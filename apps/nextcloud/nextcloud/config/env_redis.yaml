@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+spec:
+  template:
+    spec:
+      containers:
+        - name: nextcloud
+          env:
+            - name: REDIS_HOST
+              value: "$(REDIS_SERVICE_NAME)"
+            - name: REDIS_HOST_PORT
+              value: "6379"

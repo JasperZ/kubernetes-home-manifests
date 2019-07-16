@@ -1,0 +1,18 @@
+bases:
+  - ../../../components/mariadb
+patchesStrategicMerge:
+  - config/env.yaml
+  - config/resources.yaml
+secretGenerator:
+  - name: mariadb
+    literals:
+      - MYSQL_ROOT_PASSWORD=RootKey
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=NextcloudKey
+commonLabels:
+  component: mariadb
+images:
+- name: mariadb
+  newName: mariadb
+  newTag: 10.4.6-bionic

@@ -16,10 +16,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
-    - nfsvers=3
+    - nfsvers=4
   nfs:
-    path: /mnt/datacenter_250GB/k8s/volumes/home-assistant/esphome
-    server: storage.zcc.x64.me
+    path: /datacenter_250gb/k8s/volumes/home-assistant/esphome
+    server: proxmox.zhc.x64.me
 ---
 
 apiVersion: v1

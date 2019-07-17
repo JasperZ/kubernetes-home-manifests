@@ -12,10 +12,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
-    - nfsvers=3
+    - nfsvers=4
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/test/volume1
-    server: storage.zcc.x64.me
+    path: /datacenter_250gb/kubernetes/development/test/volume1
+    server: proxmox.zhc.x64.me
 ---
 
 apiVersion: v1
@@ -30,10 +30,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
-    - nfsvers=3
+    - nfsvers=4
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/test/volume2
-    server: storage.zcc.x64.me
+    path: /datacenter_250gb/kubernetes/development/test/volume2
+    server: proxmox.zhc.x64.me
 ---
 
 apiVersion: v1
@@ -48,10 +48,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
-    - nfsvers=3
+    - nfsvers=4
   nfs:
-    path: /mnt/datacenter_250GB/kubernetes/development/test/volume3
-    server: storage.zcc.x64.me
+    path: /datacenter_250gb/kubernetes/development/test/volume3
+    server: proxmox.zhc.x64.me
 ---
 
 apiVersion: v1

@@ -15,10 +15,10 @@ spec:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
-    - nfsvers=3
+    - nfsvers=4
   nfs:
-    path: /mnt/datacenter_250GB/k8s/volumes/ddclient/config
-    server: storage.zcc.x64.me
+    path: /datacenter_250gb/k8s/volumes/ddclient/config
+    server: proxmox.zhc.x64.me
 ---
 
 apiVersion: v1

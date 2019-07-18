@@ -3,8 +3,9 @@ bases:
 patchesStrategicMerge:
   - patches/node_port.yaml
   - patches/volumes.yaml
-namePrefix: testing-
+namePrefix: testing-nextcloud
 commonLabels:
+  app: nextcloud
   env: testing
 images:
   - name: nextcloud-fpm
@@ -28,7 +29,6 @@ secretGenerator:
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_PASSWORD=NextcloudKey
-
 generatorOptions:
   labels:
     component: nextcloud

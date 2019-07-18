@@ -9,9 +9,6 @@ patchesStrategicMerge:
   - patches/nextcloud.yaml
   - patches/mariadb.yaml
   - patches/redis.yaml
-namePrefix: nextcloud-
-commonLabels:
-  app: nextcloud
 vars:
   - name: MARIADB_SERVICE
     objref:

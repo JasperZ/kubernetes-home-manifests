@@ -1,13 +1,13 @@
 bases:
-  - ../../fpm
+  - ../bases
 patchesStrategicMerge:
   - patches/node_port.yaml
   - patches/volumes.yaml
-namePrefix: testing-nextcloud-
+namePrefix: testing-
 commonLabels:
   env: testing
 images:
-  - name: nextcloud
+  - name: nextcloud-fpm
     newName: nextcloud
     newTag: 16.0.3-fpm-alpine
   - name: mariadb
@@ -28,6 +28,7 @@ secretGenerator:
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_PASSWORD=NextcloudKey
+
 generatorOptions:
   labels:
     component: nextcloud

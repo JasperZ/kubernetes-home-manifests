@@ -9,7 +9,6 @@ spec:
         - name: init-redis
           image: redis
           command: ["sh", "-c", "until redis-cli -h $(REDIS_SERVICE) -p 6379 ping; do echo waiting for $(REDIS_SERVICE); sleep 2; done;"]
-
       containers:
         - name: nextcloud
           env:

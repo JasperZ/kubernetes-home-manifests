@@ -1,18 +1,13 @@
 bases:
-  - ../../../components/nextcloud
-  - ../../../components/mariadb
-  - ../../../components/redis
+  - ../bases
 patchesStrategicMerge:
-  - patches/nextcloud.yaml
-  - patches/nextcloud_mariadb.yaml
-  - patches/nextcloud_redis.yaml
-  - patches/mariadb.yaml
-  - patches/nextcloud_node_port.yaml
-namePrefix: nextcloud-
+  - patches/node_port.yaml
+  - patches/volumes.yaml
+namePrefix: testing-
 commonLabels:
-  app: nextcloud
+  env: testing
 images:
-  - name: nextcloud
+  - name: nextcloud-apache
     newName: nextcloud
     newTag: 16.0.3-apache
   - name: mariadb
@@ -34,16 +29,6 @@ generatorOptions:
   labels:
     component: nextcloud
 vars:
-  - name: MARIADB_SERVICE
-    objref:
-      kind: Service
-      name: mariadb
-      apiVersion: v1
-  - name: REDIS_SERVICE
-    objref:
-      kind: Service
-      name: redis
-      apiVersion: v1
   - name: NEXTCLOUD_SERVICE_IP
     objref:
       kind: Service

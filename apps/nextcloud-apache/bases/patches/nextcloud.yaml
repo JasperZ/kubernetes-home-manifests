@@ -7,6 +7,11 @@ spec:
     spec:
       containers:
         - name: nextcloud
+          volumeMounts:
+            - name: html
+              mountPath: /var/www/html
+            - name: data
+              mountPath: /var/www/html/data
           env:
             - name: NEXTCLOUD_ADMIN_USER
               valueFrom:

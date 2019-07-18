@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+spec:
+  template:
+    spec:
+      containers:
+        - name: nextcloud
+          env:
+            - name: NEXTCLOUD_TRUSTED_DOMAINS
+              value: "$(NEXTCLOUD_INGRESS_DOMAIN)"

@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+spec:
+  template:
+    spec:
+      volumes:
+        - name: html
+          emptyDir: {}
+        - name: data
+          emptyDir: {}

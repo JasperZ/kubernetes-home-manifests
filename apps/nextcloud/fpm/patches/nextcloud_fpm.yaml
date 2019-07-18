@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+spec:
+  template:
+    spec:
+      volumes:
+        - name: nginx
+          configMap:
+            name: fpm-nextcloud
+      containers:
+        - name: nextcloud
+          volumeMounts:
+            - name: html
+              mountPath: /var/www/html
+            - name: data
+              mountPath: /var/www/html/data
+        - name: nginx
+          image: nginx
+          volumeMounts:
+            - name: nginx
+              mountPath: /etc/nginx/conf.d
+            - name: html
+              mountPath: /var/www/html
+              readOnly: true
+            - name: data
+              mountPath: /var/www/html/data
+              readOnly: true
+          ports:
+            - containerPort: 80

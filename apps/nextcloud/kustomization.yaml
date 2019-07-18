@@ -1,7 +1,0 @@
-bases:
-  - nextcloud
-  - mariadb
-  - redis
-namePrefix: nextcloud-
-commonLabels:
-  app: nextcloud

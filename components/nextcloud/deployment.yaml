@@ -8,4 +8,4 @@ spec:
     spec:
       containers:
         - name: nextcloud
-          image: nextcloud:stable
+          image: nextcloud

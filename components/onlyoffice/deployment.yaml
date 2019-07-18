@@ -8,6 +8,6 @@ spec:
     spec:
       containers:
       - name: onlyoffice
-        image: onlyoffice/documentserver:latest
+        image: onlyoffice
         ports:
          - containerPort: 80

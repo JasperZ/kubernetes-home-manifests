@@ -8,6 +8,6 @@ spec:
     spec:
       containers:
         - name: mariadb
-          image: mariadb:latest
+          image: mariadb
           ports:
             - containerPort: 3306

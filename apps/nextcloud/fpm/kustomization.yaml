@@ -1,0 +1,30 @@
+bases:
+  - ../../../components/nextcloud
+  - ../../../components/mariadb
+  - ../../../components/redis
+patchesStrategicMerge:
+  - patches/nextcloud.yaml
+  - patches/mariadb.yaml
+  - patches/redis.yaml
+  - patches/nextcloud_fpm.yaml
+namePrefix: nextcloud-
+commonLabels:
+  app: nextcloud
+configMapGenerator:
+  - name: fpm-nextcloud
+    files:
+      - configs/fpm_nextcloud.conf
+generatorOptions:
+  labels:
+    component: nextcloud
+vars:
+  - name: MARIADB_SERVICE
+    objref:
+      kind: Service
+      name: mariadb
+      apiVersion: v1
+  - name: REDIS_SERVICE
+    objref:
+      kind: Service
+      name: redis
+      apiVersion: v1

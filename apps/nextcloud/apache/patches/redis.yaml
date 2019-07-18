@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: init-redis
+          image: redis
+          command: ["sh", "-c", "until redis-cli -h $(REDIS_SERVICE) -p 6379 ping; do echo waiting for $(REDIS_SERVICE); sleep 2; done;"]
+
+      containers:
+        - name: nextcloud
+          env:
+            - name: REDIS_HOST
+              value: "$(REDIS_SERVICE)"
+            - name: REDIS_HOST_PORT
+              value: "6379"

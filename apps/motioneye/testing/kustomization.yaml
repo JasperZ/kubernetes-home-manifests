@@ -1,0 +1,12 @@
+bases:
+- ../base
+patchesStrategicMerge:
+- patches/add_load_balancer.yaml
+namePrefix: testing-motioneye-
+commonLabels:
+  app: motioneye
+  env: testing
+images:
+- name: motioneye
+  newName: ccrisan/motioneye
+  newTag: 0.40-amd64

@@ -1,0 +1,23 @@
+bases:
+- ../base
+resources:
+- resources/influxdb/persistent_volumes.yaml
+- resources/influxdb/persistent_volume_claims.yaml
+patchesStrategicMerge:
+- patches/add_influxdb_volumes.yaml
+- patches/set_trading_symbols.yaml
+namePrefix: production-bitfinex-crawler-
+commonLabels:
+  app: bitfinex-crawler
+  env: production
+images:
+- name: bitfinex-crawler
+  newName: zdock/bitfinex-crawler
+  newTag: 0.10.4
+- name: influxdb
+  newName: influxdb
+  newTag: 1.7.7-alpine
+secretGenerator:
+- name: bucket
+  envs:
+  - ../../../secrets/production-bitfinex-crawler.env

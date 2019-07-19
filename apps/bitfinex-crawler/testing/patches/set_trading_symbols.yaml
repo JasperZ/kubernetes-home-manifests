@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitfinex-crawler
+spec:
+  template:
+    spec:
+      containers:
+      - name: bitfinex-crawler
+        env:
+        - name: TICKER_SYMBOLS
+          value: "tBTCUSD,tETHUSD"

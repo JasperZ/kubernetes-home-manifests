@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitfinex-crawler
+  labels:
+    component: bitfinex-crawler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: bitfinex-crawler
+  template:
+    metadata:
+      labels:
+        component: bitfinex-crawler
+    spec:
+      containers:
+      - name: bitfinex-crawler
+        image: bitfinex-crawler

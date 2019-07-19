@@ -7,15 +7,15 @@ metadata:
 spec:
   replicas: 1
   selector:
-      matchLabels:
-        component: mariadb
+    matchLabels:
+      component: mariadb
   template:
     metadata:
       labels:
         component: mariadb
     spec:
       containers:
-        - name: mariadb
-          image: mariadb
-          ports:
-            - containerPort: 3306
+      - name: mariadb
+        image: mariadb
+        ports:
+        - containerPort: 3306

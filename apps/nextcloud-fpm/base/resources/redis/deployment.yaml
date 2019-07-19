@@ -7,15 +7,15 @@ metadata:
 spec:
   replicas: 1
   selector:
-      matchLabels:
-        component: redis
+    matchLabels:
+      component: redis
   template:
     metadata:
       labels:
         component: redis
     spec:
       containers:
-        - name: redis
-          image: redis
-          ports:
-            - containerPort: 6379
+      - name: redis
+        image: redis
+        ports:
+        - containerPort: 6379

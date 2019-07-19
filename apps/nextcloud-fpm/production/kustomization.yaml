@@ -3,12 +3,29 @@ bases:
 resources:
 - resources/certificate.yaml
 - resources/ingress.yaml
+- resources/nextcloud/persistent_volumes.yaml
+- resources/nextcloud/persistent_volume_claims.yaml
+- resources/nextcloud/cronjob.yaml
+- resources/mariadb/persistent_volumes.yaml
+- resources/mariadb/persistent_volume_claims.yaml
+- resources/redis/persistent_volumes.yaml
+- resources/redis/persistent_volume_claims.yaml
 patchesStrategicMerge:
 - patches/set_nextcloud_trusted_domain.yaml
-namePrefix: testing-nextcloud-
+# - patches/add_nextcloud_volumes.yaml
+- patches/add_mariadb_volumes.yaml
+- patches/add_redis_volumes.yaml
+patchesJson6902:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: nextcloud
+  path: patches/add_nextcloud_volumes.json
+namePrefix: production-nextcloud-
 commonLabels:
   app: nextcloud
-  env: testing
+  env: production
 images:
 - name: nextcloud-fpm
   newName: nextcloud
@@ -24,13 +41,8 @@ images:
   newTag: 1.17.1-alpine
 secretGenerator:
 - name: bucket
-  literals:
-  - NEXTCLOUD_ADMIN_USER=admin
-  - NEXTCLOUD_ADMIN_PASSWORD=AdminKey
-  - MYSQL_ROOT_PASSWORD=RootKey
-  - MYSQL_DATABASE=nextcloud
-  - MYSQL_USER=nextcloud
-  - MYSQL_PASSWORD=NextcloudKey
+  envs:
+  - ../../../secrets/production-nextcloud.env
 generatorOptions:
   labels:
     component: nextcloud

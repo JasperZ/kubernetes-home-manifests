@@ -1,0 +1,17 @@
+bases:
+- ../base
+resources:
+- resources/persistent_volumes.yaml
+- resources/persistent_volume_claims.yaml
+patchesStrategicMerge:
+- patches/set_resources.yaml
+- patches/add_volumes.yaml
+- patches/add_load_balancer.yaml
+namePrefix: production-motioneye-
+commonLabels:
+  app: motioneye
+  env: production
+images:
+- name: motioneye
+  newName: ccrisan/motioneye
+  newTag: 0.40-amd64

@@ -16,10 +16,10 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   mountOptions:
-    - nfsvers=3
+    - nfsvers=4
   nfs:
-    path: /mnt/datacenter_4TB/k8s/volumes/motioneye/motioneye/media
-    server: storage.zcc.x64.me
+    path: /datacenter_4tb/k8s/volumes/motioneye/motioneye/media
+    server: proxmox.zhc.x64.me
 ---
 
 apiVersion: v1

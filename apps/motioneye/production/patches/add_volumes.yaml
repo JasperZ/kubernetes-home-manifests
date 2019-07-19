@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: motioneye
+spec:
+  template:
+    spec:
+      volumes:
+      - name: media
+        persistentVolumeClaim:
+          claimName: motioneye-media
+      - name: config
+        persistentVolumeClaim:
+          claimName: motioneye-config
+      containers:
+      - name: motioneye
+        volumeMounts:
+        - name: media
+          mountPath: /var/lib/motioneye
+        - name: config
+          mountPath: /etc/motioneye

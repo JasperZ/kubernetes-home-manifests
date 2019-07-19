@@ -4,6 +4,7 @@ resources:
 - resources/influxdb/persistent_volumes.yaml
 - resources/influxdb/persistent_volume_claims.yaml
 patchesStrategicMerge:
+- patches/set_resources.yaml
 - patches/add_influxdb_volumes.yaml
 - patches/set_trading_symbols.yaml
 namePrefix: production-bitfinex-crawler-
@@ -14,6 +15,9 @@ images:
 - name: bitfinex-crawler
   newName: zdock/bitfinex-crawler
   newTag: 0.10.4
+- name: curl
+  newName: appropriate/curl
+  newTag: latest
 - name: influxdb
   newName: influxdb
   newTag: 1.7.7-alpine

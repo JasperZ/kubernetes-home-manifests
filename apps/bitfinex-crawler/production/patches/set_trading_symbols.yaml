@@ -9,4 +9,4 @@ spec:
       - name: bitfinex-crawler
         env:
         - name: TICKER_SYMBOLS
-          value: "tBTCUSD,tETHUSD"
+          value: "tBTCUSD,tETHUSD,tIOTUSD"

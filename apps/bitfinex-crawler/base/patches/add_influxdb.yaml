@@ -53,6 +53,10 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+      - name: init-influxdb
+        image: curl
+        command: ["sh", "-c", "until curl -sL -I $(INFLUXDB_SERVICE):8086/ping; do echo waiting for $(INFLUXDB_SERVICE); sleep 2; done;"]
       containers:
       - name: bitfinex-crawler
         env:

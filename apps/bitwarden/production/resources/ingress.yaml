@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: bitwarden
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: "16G"
+spec:
+  tls:
+  - hosts:
+    - bitwarden.jz-c.org
+    secretName: bitwarden-jz-c-org-production-tls
+  rules:
+  - host: bitwarden.jz-c.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: bitwarden
+          servicePort: 80
+      - path: /notifications/hub/negotiate
+        backend:
+          serviceName: bitwarden
+          servicePort: 80
+      - path: /notifications/hub
+        backend:
+          serviceName: bitwarden-websocket
+          servicePort: 3012

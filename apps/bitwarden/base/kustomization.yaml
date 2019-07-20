@@ -1,0 +1,3 @@
+resources:
+  - resources/bitwarden/deployment.yaml
+  - resources/bitwarden/service.yaml

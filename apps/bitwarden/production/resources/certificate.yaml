@@ -1,0 +1,21 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: bitwarden-jz-c-org-production
+  namespace: default
+  annotations:
+    domain: bitwarden.jz-c.org
+spec:
+  secretName: bitwarden-jz-c-org-production-tls
+  commonName: bitwarden.jz-c.org
+  dnsNames:
+  - bitwarden.jz-c.org
+  issuerRef:
+    name: letsencrypt-production-issuer
+    kind: Issuer
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - bitwarden.jz-c.org

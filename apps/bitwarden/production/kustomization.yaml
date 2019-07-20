@@ -1,0 +1,26 @@
+bases:
+- ../base
+patchesStrategicMerge:
+- patches/set_domain.yaml
+- patches/disable_signups.yaml
+resources:
+- resources/certificate.yaml
+- resources/ingress.yaml
+- resources/bitwarden/persistent_volumes.yaml
+- resources/bitwarden/persistent_volume_claims.yaml
+namePrefix: production-bitwarden-
+commonLabels:
+  app: bitwarden
+  env: production
+images:
+- name: bitwarden
+  newName: bitwardenrs/server
+  newTag: 1.9.1-alpine
+vars:
+- name: BITWARDEN_INGRESS_DOMAIN
+  objref:
+    kind: Certificate
+    name: bitwarden-jz-c-org-production
+    apiVersion: certmanager.k8s.io/v1alpha1
+  fieldref:
+    fieldpath: metadata.annotations.domain

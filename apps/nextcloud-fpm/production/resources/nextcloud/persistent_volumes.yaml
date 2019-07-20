@@ -12,7 +12,7 @@ spec:
   mountOptions:
     - nfsvers=4
   nfs:
-    path: /datacenter_250gb/k8s/testing-volumes/nextcloud-fpm/nextcloud/html
+    path: /datacenter_250gb/k8s/volumes/nextcloud/nextcloud/html
     server: proxmox.zhc.x64.me
 ---
 apiVersion: v1
@@ -29,7 +29,7 @@ spec:
   mountOptions:
     - nfsvers=4
   nfs:
-    path: /datacenter_250gb/k8s/testing-volumes/nextcloud-fpm/nextcloud/custom_apps
+    path: /datacenter_250gb/k8s/volumes/nextcloud/nextcloud/custom_apps
     server: proxmox.zhc.x64.me
 ---
 apiVersion: v1
@@ -46,7 +46,7 @@ spec:
   mountOptions:
     - nfsvers=4
   nfs:
-    path: /datacenter_250gb/k8s/testing-volumes/nextcloud-fpm/nextcloud/config
+    path: /datacenter_250gb/k8s/volumes/nextcloud/nextcloud/config
     server: proxmox.zhc.x64.me
 ---
 apiVersion: v1
@@ -63,5 +63,5 @@ spec:
   mountOptions:
     - nfsvers=4
   nfs:
-    path: /datacenter_250gb/k8s/testing-volumes/nextcloud-fpm/nextcloud/data
+    path: /datacenter_4tb/k8s/volumes/nextcloud/nextcloud/data
     server: proxmox.zhc.x64.me

@@ -6,7 +6,7 @@ resources:
 patchesStrategicMerge:
 - patches/set_resources.yaml
 - patches/add_ddclient_volumes.yaml
-namePrefix: production-bitfinex-crawler-
+namePrefix: production-ddclient-
 commonLabels:
   app: ddclient
   env: production

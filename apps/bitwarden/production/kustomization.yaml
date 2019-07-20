@@ -2,6 +2,8 @@ bases:
 - ../base
 patchesStrategicMerge:
 - patches/set_domain.yaml
+- patches/set_smtp.yaml
+- patches/set_admin_token.yaml
 - patches/set_resources.yaml
 - patches/add_bitwarden_volumes.yaml
 - patches/disable_signups.yaml
@@ -26,3 +28,10 @@ vars:
     apiVersion: certmanager.k8s.io/v1alpha1
   fieldref:
     fieldpath: metadata.annotations.domain
+secretGenerator:
+- name: bucket
+  envs:
+  - ../../../secrets/production-bitwarden.env
+generatorOptions:
+  labels:
+    component: bitwarden

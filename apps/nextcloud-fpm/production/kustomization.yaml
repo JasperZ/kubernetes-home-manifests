@@ -12,7 +12,7 @@ resources:
 - resources/redis/persistent_volume_claims.yaml
 patchesStrategicMerge:
 - patches/set_nextcloud_trusted_domain.yaml
-# - patches/add_nextcloud_volumes.yaml
+- patches/set_resources.yaml
 - patches/add_mariadb_volumes.yaml
 - patches/add_redis_volumes.yaml
 patchesJson6902:

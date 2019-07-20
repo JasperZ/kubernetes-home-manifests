@@ -1,0 +1,12 @@
+bases:
+- ../base
+patchesStrategicMerge:
+- patches/add_load_balancer.yaml
+namePrefix: testing-urbackup-
+commonLabels:
+  app: urbackup
+  env: testing
+images:
+- name: urbackup
+  newName: uroni/urbackup-server
+  newTag: latest

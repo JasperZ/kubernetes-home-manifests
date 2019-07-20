@@ -2,6 +2,8 @@ bases:
 - ../base
 patchesStrategicMerge:
 - patches/set_domain.yaml
+- patches/set_resources.yaml
+- patches/add_bitwarden_volumes.yaml
 - patches/disable_signups.yaml
 resources:
 - resources/certificate.yaml
@@ -20,7 +22,7 @@ vars:
 - name: BITWARDEN_INGRESS_DOMAIN
   objref:
     kind: Certificate
-    name: bitwarden-jz-c-org-production
+    name: bitwarden-jz-c-org
     apiVersion: certmanager.k8s.io/v1alpha1
   fieldref:
     fieldpath: metadata.annotations.domain

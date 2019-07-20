@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitwarden
+spec:
+  template:
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: bitwarden-data
+      containers:
+      - name: bitwarden
+        volumeMounts:
+        - name: data
+          mountPath: /data

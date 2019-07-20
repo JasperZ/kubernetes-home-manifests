@@ -50,7 +50,7 @@ vars:
 - name: NEXTCLOUD_INGRESS_DOMAIN
   objref:
     kind: Certificate
-    name: test-jz-c-org-production
+    name: test-jz-c-org
     apiVersion: certmanager.k8s.io/v1alpha1
   fieldref:
     fieldpath: metadata.annotations.domain

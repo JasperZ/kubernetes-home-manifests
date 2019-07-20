@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: urbackup
+spec:
+  template:
+    spec:
+      volumes:
+      - name: backups
+        persistentVolumeClaim:
+          claimName: urbackup-backups
+      - name: database
+        persistentVolumeClaim:
+          claimName: urbackup-database
+      containers:
+      - name: motioneye
+        volumeMounts:
+        - mountPath: /backups
+          name: backups
+        - mountPath: /var/urbackup
+          name: database

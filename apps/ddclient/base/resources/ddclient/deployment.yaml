@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddclient
+  labels:
+    component: ddclient
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: ddclient
+  template:
+    metadata:
+      labels:
+        component: ddclient
+    spec:
+      containers:
+      - name: ddclient
+        image: ddclient

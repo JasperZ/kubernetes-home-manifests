@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddclient
+spec:
+  template:
+    spec:
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: ddclient-config
+      containers:
+      - name: ddclient
+        volumeMounts:
+        - name: config
+          mountPath: /config

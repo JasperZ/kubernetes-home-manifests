@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddclient
+spec:
+  template:
+    spec:
+      containers:
+      - name: ddclient
+        resources:
+          limits:
+            cpu: "125m"
+            memory: "128Mi"
+          requests:
+            cpu: "125m"
+            memory: "128Mi"

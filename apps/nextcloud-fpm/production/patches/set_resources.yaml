@@ -75,3 +75,20 @@ spec:
           requests:
             cpu: "125m"
             memory: "128Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice
+spec:
+  template:
+    spec:
+      containers:
+      - name: onlyoffice
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"

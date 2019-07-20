@@ -1,8 +1,8 @@
 bases:
 - ../base
 resources:
-- resources/certificate.yaml
-- resources/ingress.yaml
+- resources/nextcloud/certificate.yaml
+- resources/nextcloud/ingress.yaml
 - resources/nextcloud/persistent_volumes.yaml
 - resources/nextcloud/persistent_volume_claims.yaml
 - resources/nextcloud/cronjob.yaml
@@ -10,6 +10,10 @@ resources:
 - resources/mariadb/persistent_volume_claims.yaml
 - resources/redis/persistent_volumes.yaml
 - resources/redis/persistent_volume_claims.yaml
+- resources/onlyoffice/deployment.yaml
+- resources/onlyoffice/service.yaml
+- resources/onlyoffice/certificate.yaml
+- resources/onlyoffice/ingress.yaml
 patchesStrategicMerge:
 - patches/set_nextcloud_trusted_domain.yaml
 - patches/set_resources.yaml
@@ -39,6 +43,9 @@ images:
 - name: nginx
   newName: nginx
   newTag: 1.17.1-alpine
+- name: onlyoffice
+  newName: onlyoffice/documentserver
+  newTag: 5.2.8.24
 secretGenerator:
 - name: bucket
   envs:

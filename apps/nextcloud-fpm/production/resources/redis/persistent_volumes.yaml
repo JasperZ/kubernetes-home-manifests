@@ -12,5 +12,5 @@ spec:
   mountOptions:
     - nfsvers=4
   nfs:
-    path: /datacenter_250gb/k8s/testing-volumes/nextcloud-fpm/redis/data
+    path: /datacenter_250gb/k8s/volumes/nextcloud/redis/data
     server: proxmox.zhc.x64.me

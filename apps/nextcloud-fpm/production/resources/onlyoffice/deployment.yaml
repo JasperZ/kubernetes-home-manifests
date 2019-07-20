@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice
+  labels:
+    component: onlyoffice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: onlyoffice
+  template:
+    metadata:
+      labels:
+        component: onlyoffice
+    spec:
+      containers:
+      - name: onlyoffice
+        image: onlyoffice
+        env:
+        - name: JWT_ENABLED
+          value: "true"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: bucket
+              key: JWT_SECRET
+        ports:
+        - containerPort: 80

@@ -1,15 +1,15 @@
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: test-jz-c-org
+  name: nextcloud-jz-c-org
   namespace: default
   annotations:
-    domain: test.jz-c.org
+    domain: nextcloud.jz-c.org
 spec:
-  secretName: test-jz-c-org-production-tls
-  commonName: test.jz-c.org
+  secretName: nextcloud-jz-c-org-production-tls
+  commonName: nextcloud.jz-c.org
   dnsNames:
-  - test.jz-c.org
+  - nextcloud.jz-c.org
   issuerRef:
     name: letsencrypt-production-issuer
     kind: Issuer
@@ -18,4 +18,4 @@ spec:
     - http01:
         ingressClass: nginx
       domains:
-      - test.jz-c.org
+      - nextcloud.jz-c.org

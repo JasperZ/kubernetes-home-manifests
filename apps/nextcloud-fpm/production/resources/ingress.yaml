@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - test.jz-c.org
-    secretName: test-jz-c-org-production-tls
+    - nextcloud.jz-c.org
+    secretName: nextcloud-jz-c-org-production-tls
   rules:
-  - host: test.jz-c.org
+  - host: nextcloud.jz-c.org
     http:
       paths:
       - backend:

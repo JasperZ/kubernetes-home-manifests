@@ -13,7 +13,7 @@ spec:
         persistentVolumeClaim:
           claimName: urbackup-database
       containers:
-      - name: motioneye
+      - name: urbackup
         volumeMounts:
         - mountPath: /backups
           name: backups

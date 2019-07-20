@@ -9,4 +9,4 @@ spec:
       - name: bitwarden
         env:
         - name: DOMAIN
-          value: "$(BITWARDEN_INGRESS_DOMAIN)"
+          value: "https://$(BITWARDEN_INGRESS_DOMAIN)"

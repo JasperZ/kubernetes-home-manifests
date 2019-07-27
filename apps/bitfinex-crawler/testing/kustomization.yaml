@@ -9,10 +9,10 @@ commonLabels:
 images:
 - name: bitfinex-crawler
   newName: zdock/bitfinex-crawler
-  newTag: 0.10.4
+  newTag: golang-latest
 - name: curl
   newName: appropriate/curl
-  newTag: 3.1
+  newTag: "latest"
 - name: influxdb
   newName: influxdb
   newTag: 1.7.7-alpine

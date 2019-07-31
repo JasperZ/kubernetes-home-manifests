@@ -2,6 +2,7 @@ bases:
 - ../base
 patchesStrategicMerge:
 - patches/set_trading_symbols.yaml
+- patches/add_load_balancer.yaml
 namePrefix: testing-bitfinex-crawler-
 commonLabels:
   app: bitfinex-crawler

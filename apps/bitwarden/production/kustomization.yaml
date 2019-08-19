@@ -31,7 +31,7 @@ vars:
 secretGenerator:
 - name: bucket
   envs:
-  - ../../../secrets/production-bitwarden.env
+  - production-bitwarden.env
 generatorOptions:
   labels:
     component: bitwarden

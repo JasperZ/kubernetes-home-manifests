@@ -24,4 +24,4 @@ images:
 secretGenerator:
 - name: bucket
   envs:
-  - ../../../secrets/production-bitfinex-crawler.env
+  - production-bitfinex-crawler.env

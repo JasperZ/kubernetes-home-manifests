@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+spec:
+  template:
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: influxdb-data
+      containers:
+      - name: influxdb
+        volumeMounts:
+          - name: influxdb-data-volume
+            mountPath: /var/lib/influxdb

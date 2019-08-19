@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-red
+  labels:
+    component: node-red
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: node-red
+  template:
+    metadata:
+      labels:
+        component: node-red
+    spec:
+      containers:
+      - name: node-red
+        image: node-red
+        env:
+        - name: TZ
+          value: "Europe/Berlin"
+        ports:
+        - containerPort: 1880

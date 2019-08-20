@@ -7,3 +7,9 @@ resources:
   - resources/influxdb/service.yaml
 patchesStrategicMerge:
   - patches/add_influxdb.yaml
+vars:
+  - name: INFLUXDB_SERVICE
+    objref:
+      kind: Service
+      name: influxdb
+      apiVersion: v1

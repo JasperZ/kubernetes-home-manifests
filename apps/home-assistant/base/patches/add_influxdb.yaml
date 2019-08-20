@@ -56,4 +56,4 @@ spec:
       initContainers:
       - name: init-influxdb
         image: appropriate/curl
-        command: ["sh", "-c", "until curl -sL -I home-assistant-influxdb:8086/ping; do echo waiting for home-assistant-influxdb; sleep 2; done;"]
+        command: ["sh", "-c", "until curl -sL -I $(INFLUXDB_SERVICE):8086/ping; do echo waiting for $(INFLUXDB_SERVICE); sleep 2; done;"]

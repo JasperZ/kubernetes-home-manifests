@@ -12,5 +12,5 @@ spec:
       containers:
       - name: influxdb
         volumeMounts:
-          - name: influxdb-data-volume
+          - name: data
             mountPath: /var/lib/influxdb

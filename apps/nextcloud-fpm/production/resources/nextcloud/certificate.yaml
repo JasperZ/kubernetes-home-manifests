@@ -6,16 +6,10 @@ metadata:
   annotations:
     domain: nextcloud.jz-c.org
 spec:
-  secretName: nextcloud-jz-c-org-production-tls
+  secretName: production-nextcloud-jz-c-org-tls
   commonName: nextcloud.jz-c.org
   dnsNames:
   - nextcloud.jz-c.org
   issuerRef:
-    name: letsencrypt-production-issuer
-    kind: Issuer
-  acme:
-    config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - nextcloud.jz-c.org
+    name: production-letsencrypt
+    kind: ClusterIssuer

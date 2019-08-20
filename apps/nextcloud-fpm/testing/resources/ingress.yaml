@@ -9,7 +9,7 @@ spec:
   tls:
   - hosts:
     - test.jz-c.org
-    secretName: test-jz-c-org-production-tls
+    secretName: production-test-jz-c-org-tls
   rules:
   - host: test.jz-c.org
     http:

@@ -7,8 +7,8 @@ patchesStrategicMerge:
 - patches/add_influxdb_volumes.yaml
 - patches/add_load_balancer.yaml
 resources:
-- resources/certificate.yaml
-- resources/ingress.yaml
+- resources/home-assistant/certificate.yaml
+- resources/home-assistant/ingress.yaml
 - resources/home-assistant/persistent_volumes.yaml
 - resources/home-assistant/persistent_volume_claims.yaml
 - resources/node-red/persistent_volumes.yaml

@@ -9,7 +9,7 @@ spec:
   tls:
   - hosts:
     - home-assistant.jz-c.org
-    secretName: home-assistant-jz-c-org-production-tls
+    secretName: production-home-assistant-jz-c-org-tls
   rules:
   - host: home-assistant.jz-c.org
     http:

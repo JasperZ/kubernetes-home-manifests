@@ -9,7 +9,7 @@ spec:
   tls:
   - hosts:
     - nextcloud.jz-c.org
-    secretName: nextcloud-jz-c-org-production-tls
+    secretName: production-nextcloud-jz-c-org-tls
   rules:
   - host: nextcloud.jz-c.org
     http:

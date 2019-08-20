@@ -9,7 +9,7 @@ spec:
   tls:
   - hosts:
     - bitwarden.jz-c.org
-    secretName: bitwarden-jz-c-org-production-tls
+    secretName: production-bitwarden-jz-c-org-tls
   rules:
   - host: bitwarden.jz-c.org
     http:

@@ -6,16 +6,10 @@ metadata:
   annotations:
     domain: office.jz-c.org
 spec:
-  secretName: office-jz-c-org-production-tls
+  secretName: production-office-jz-c-org-tls
   commonName: office.jz-c.org
   dnsNames:
   - office.jz-c.org
   issuerRef:
-    name: letsencrypt-production-issuer
-    kind: Issuer
-  acme:
-    config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - office.jz-c.org
+    name: production-letsencrypt
+    kind: ClusterIssuer

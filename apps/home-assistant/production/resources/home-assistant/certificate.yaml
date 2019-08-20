@@ -6,16 +6,10 @@ metadata:
   annotations:
     domain: home-assistant.jz-c.org
 spec:
-  secretName: home-assistant-jz-c-org-production-tls
+  secretName: production-home-assistant-jz-c-org-tls
   commonName: home-assistant.jz-c.org
   dnsNames:
   - home-assistant.jz-c.org
   issuerRef:
-    name: letsencrypt-production-issuer
-    kind: Issuer
-  acme:
-    config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - home-assistant.jz-c.org
+    name: production-letsencrypt
+    kind: ClusterIssuer

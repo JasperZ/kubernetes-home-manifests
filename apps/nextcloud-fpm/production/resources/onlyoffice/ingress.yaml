@@ -9,7 +9,7 @@ spec:
   tls:
   - hosts:
     - office.jz-c.org
-    secretName: office-jz-c-org-production-tls
+    secretName: production-office-jz-c-org-tls
   rules:
   - host: office.jz-c.org
     http:

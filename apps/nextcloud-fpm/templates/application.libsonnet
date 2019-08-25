@@ -75,7 +75,7 @@ local new(conf) = {
                         kube.containerVolumeMount(mariadbDataDir, "/var/lib/mysql"),
                     ] else []
                 ),
-                resources = kube.resources("125m", "128Mi", "500m", "512Mi"),
+                resources = conf.kube.mariadb.resources,
             ),
         ],
         volumes = (
@@ -138,7 +138,7 @@ local new(conf) = {
                         kube.containerVolumeMount(redisDataDir, "/data"),
                     ] else []
                 ),
-                resources = kube.resources("125m", "128Mi", "250m", "256Mi"),
+                resources = conf.kube.redis.resources,
             ),
         ],
         volumes = (
@@ -179,7 +179,7 @@ local new(conf) = {
                 ports = [
                     kube.containerPort(80),
                 ],
-                resources = kube.resources("250m", "256Mi", "1000m", "1024Mi"),
+                resources = conf.kube.onlyoffice.resources,
             ),
         ],
         volumes = (
@@ -329,7 +329,7 @@ local new(conf) = {
                     kube.containerVolumeMount(nextcloudConfigDir, "/var/www/html/config"),
                     kube.containerVolumeMount(nextcloudDataDir, "/var/www/html/data"),
                 ],
-                resources = kube.resources("250m", "256Mi", "500m", "512Mi"),
+                resources = conf.kube.nextcloud.resources,
             ),
             kube.deploymentContainer(
                 nextcloudComponentName + "-nginx",
@@ -345,7 +345,7 @@ local new(conf) = {
                     kube.containerVolumeMount(nextcloudConfigDir, "/var/www/html/config"),
                     kube.containerVolumeMount(nextcloudDataDir, "/var/www/html/data"),
                 ],
-                resources = kube.resources("125m", "128Mi", "250m", "256Mi"),
+                resources = conf.kube.nextcloud.nginx.resources,
             ),
         ],
         initContainers = (
@@ -429,7 +429,7 @@ local new(conf) = {
                 kube.containerVolumeMount(nextcloudConfigDir, "/var/www/html/config"),
                 kube.containerVolumeMount(nextcloudDataDir, "/var/www/html/data"),
             ],
-            resources = kube.resources("125m", "128Mi", "250m", "256Mi"),
+            resources = conf.kube.nextcloud.cronJob.resources,
         ),
         initContainers = (
             if conf.app.mariadb.use then [

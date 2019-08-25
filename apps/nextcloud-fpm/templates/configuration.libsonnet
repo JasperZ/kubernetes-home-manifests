@@ -7,6 +7,78 @@
             name:: error "certificateIssuer.name is required",
             kind:: error "certificateIssuer.kind is required",
         },
+        nextcloud:: {
+            resources:: {
+                requests:: {
+                    cpu:: "250m",
+                    memory:: "256Mi",
+                },
+                limits:: {
+                    cpu:: "500m",
+                    memory:: "512Mi",
+                },
+            },
+            nginx:: {
+                resources:: {
+                    requests:: {
+                        cpu:: "125m",
+                        memory:: "128Mi",
+                    },
+                    limits:: {
+                        cpu:: "250m",
+                        memory:: "256Mi",
+                    },
+                },
+            },
+            cronJob::{
+                resources:: {
+                    requests:: {
+                        cpu:: "250m",
+                        memory:: "256Mi",
+                    },
+                    limits:: {
+                        cpu:: "500m",
+                        memory:: "512Mi",
+                    },
+                },
+            },
+        },
+        mariadb:: {
+            resources:: {
+                requests:: {
+                    cpu:: "125m",
+                    memory:: "128Mi",
+                },
+                limits:: {
+                    cpu:: "500m",
+                    memory:: "512Mi",
+                },
+            },
+        },
+        redis:: {
+            resources:: {
+                requests:: {
+                    cpu:: "125m",
+                    memory:: "128Mi",
+                },
+                limits:: {
+                    cpu:: "250m",
+                    memory:: "256Mi",
+                },
+            },
+        },
+        onlyoffice:: {
+            resources:: {
+                requests:: {
+                    cpu:: "250m",
+                    memory:: "256Mi",
+                },
+                limits:: {
+                    cpu:: "1000m",
+                    memory:: "1024Mi",
+                },
+            },
+        },
     },
     application:: {
         nextcloud:: {
@@ -56,6 +128,81 @@
         certificateIssuer: {
             name: $.kubernetes.certificateIssuer.name,
             kind: $.kubernetes.certificateIssuer.kind,
+        },
+        nextcloud: {
+            resources: {
+                requests: {
+                    cpu: $.kubernetes.nextcloud.resources.requests.cpu,
+                    memory: $.kubernetes.nextcloud.resources.requests.memory,
+                },
+                limits: {
+                    cpu: $.kubernetes.nextcloud.resources.limits.cpu,
+                    memory: $.kubernetes.nextcloud.resources.limits.memory,
+                },
+            },
+            nginx: {
+                resources: {
+                    requests: {
+                        cpu: $.kubernetes.nextcloud.nginx.resources.requests.cpu,
+                        memory: $.kubernetes.nextcloud.nginx.resources.requests.memory,
+                    },
+                    limits: {
+                        cpu: $.kubernetes.nextcloud.nginx.resources.limits.cpu,
+                        memory: $.kubernetes.nextcloud.nginx.resources.limits.memory,
+                    },
+                },
+            },
+        } + (
+            if $.application.persistentData.use then {
+                cronJob: {
+                    resources: {
+                        requests: {
+                            cpu: $.kubernetes.nextcloud.cronJob.resources.requests.cpu,
+                            memory: $.kubernetes.nextcloud.cronJob.resources.requests.memory,
+                        },
+                        limits: {
+                            cpu: $.kubernetes.nextcloud.cronJob.resources.limits.cpu,
+                            memory: $.kubernetes.nextcloud.cronJob.resources.limits.memory,
+                        },
+                    },
+                },
+            } else {}
+        ),
+        [if $.application.mariadb.use then "mariadb"]: {
+            resources: {
+                requests: {
+                    cpu: $.kubernetes.mariadb.resources.requests.cpu,
+                    memory: $.kubernetes.mariadb.resources.requests.memory,
+                },
+                limits: {
+                    cpu: $.kubernetes.mariadb.resources.limits.cpu,
+                    memory: $.kubernetes.mariadb.resources.limits.memory,
+                },
+            },
+        },
+        [if $.application.redis.use then "redis"]: {
+            resources: {
+                requests: {
+                    cpu: $.kubernetes.redis.resources.requests.cpu,
+                    memory: $.kubernetes.redis.resources.requests.memory,
+                },
+                limits: {
+                    cpu: $.kubernetes.redis.resources.limits.cpu,
+                    memory: $.kubernetes.redis.resources.limits.memory,
+                },
+            },
+        },
+        [if $.application.onlyoffice.use then "onlyoffice"]: {
+            resources: {
+                requests: {
+                    cpu: $.kubernetes.onlyoffice.resources.requests.cpu,
+                    memory: $.kubernetes.onlyoffice.resources.requests.memory,
+                },
+                limits: {
+                    cpu: $.kubernetes.onlyoffice.resources.limits.cpu,
+                    memory: $.kubernetes.onlyoffice.resources.limits.memory,
+                },
+            },
         },
     },
     app: {

@@ -407,30 +407,32 @@ local new(conf) = {
     // Nextcloud CronJob
     local nextcloudCronJob = kube.cronJob(
         namespace,
-        name + "-" + nextcloudComponentName,
+        name + "-" + nextcloudComponentName + "-cron",
         labels + {component: nextcloudComponentName},
         "*/15 * * * *",
-        kube.deploymentContainer(
-            nextcloudComponentName,
-            "nextcloud",
-            conf.app.nextcloud.imageTag,
-            command = [
-                "su",
-                "-p",
-                "www-data",
-                "-s",
-                "/bin/sh",
-                "-c", 
-                "php -f /var/www/html/cron.php",
-            ],
-            volumeMounts = [
-                kube.containerVolumeMount(nextcloudHtmlDir, "/var/www/html"),
-                kube.containerVolumeMount(nextcloudCustomAppsDir, "/var/www/html/custom_apps"),
-                kube.containerVolumeMount(nextcloudConfigDir, "/var/www/html/config"),
-                kube.containerVolumeMount(nextcloudDataDir, "/var/www/html/data"),
-            ],
-            resources = conf.kube.nextcloud.cronJob.resources,
-        ),
+        [
+            kube.deploymentContainer(
+                nextcloudComponentName,
+                "nextcloud",
+                conf.app.nextcloud.imageTag,
+                command = [
+                    "su",
+                    "-p",
+                    "www-data",
+                    "-s",
+                    "/bin/sh",
+                    "-c", 
+                    "php -f /var/www/html/cron.php",
+                ],
+                volumeMounts = [
+                    kube.containerVolumeMount(nextcloudHtmlDir, "/var/www/html"),
+                    kube.containerVolumeMount(nextcloudCustomAppsDir, "/var/www/html/custom_apps"),
+                    kube.containerVolumeMount(nextcloudConfigDir, "/var/www/html/config"),
+                    kube.containerVolumeMount(nextcloudDataDir, "/var/www/html/data"),
+                ],
+                resources = conf.kube.nextcloud.cronJob.resources,
+            ),
+        ],
         initContainers = (
             if conf.app.mariadb.use then [
                 kube.deploymentContainer(
@@ -446,14 +448,6 @@ local new(conf) = {
                         kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
                         kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
                     ],
-                    ports = [
-                        kube.containerPort(3306),
-                    ],
-                    volumeMounts = (
-                        if conf.app.persistentData.use then [
-                            kube.containerVolumeMount(mariadbDataDir, "/var/lib/mysql"),
-                        ] else []
-                    ),
                 ),
             ] else []
         ) + (
@@ -468,6 +462,14 @@ local new(conf) = {
                         "until redis-cli -h %(service)s -p 6379 ping; do echo waiting for %(service)s; sleep 2; done;" % {service: redisService.metadata.name},
                     ],
                 ),
+            ] else []
+        ),
+        volumes = (
+            if conf.app.persistentData.use then [
+                kube.deploymentVolumePVC(nextcloudHtmlDir, nextcloudPersistentVolumeClaims.html.metadata.name),
+                kube.deploymentVolumePVC(nextcloudCustomAppsDir, nextcloudPersistentVolumeClaims.customApps.metadata.name),
+                kube.deploymentVolumePVC(nextcloudConfigDir, nextcloudPersistentVolumeClaims.config.metadata.name),
+                kube.deploymentVolumePVC(nextcloudDataDir, nextcloudPersistentVolumeClaims.data.metadata.name),
             ] else []
         ),
     ),

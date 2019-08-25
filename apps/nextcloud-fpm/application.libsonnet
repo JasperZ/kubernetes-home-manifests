@@ -1,4 +1,4 @@
-local kube = import "../../../templates/kubernetes.libsonnet";
+local kube = import "../../templates/kubernetes.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,

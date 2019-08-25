@@ -290,7 +290,7 @@ local new(conf) = {
         name + "-" + nextcloudComponentName + "-nginx",
         labels + {component: nextcloudComponentName},
         {
-            "fpm_nextcloud.conf": importstr "../resources/fpm_nextcloud.conf",
+            "fpm_nextcloud.conf": importstr "resources/fpm_nextcloud.conf",
         },
     ),
 

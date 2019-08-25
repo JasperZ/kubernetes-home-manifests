@@ -92,7 +92,7 @@ local new(conf) = {
         labels + {component: mariadbComponentName},
         mariadbDeployment.metadata.labels,
         [
-            kube.servicePort("TCP", 3306, 3306),
+            kube.servicePort("mysql", "TCP", 3306, 3306),
         ],
     ),
 
@@ -155,7 +155,7 @@ local new(conf) = {
         labels + {component: redisComponentName},
         redisDeployment.metadata.labels,
         [
-            kube.servicePort("TCP", 6379, 6379),
+            kube.servicePort("redis", "TCP", 6379, 6379),
         ],
     ),
 
@@ -196,7 +196,7 @@ local new(conf) = {
         labels + {component: onlyofficeComponentName},
         onlyofficeDeployment.metadata.labels,
         [
-            kube.servicePort("TCP", 80, 80),
+            kube.servicePort("http", "TCP", 80, 80),
         ],
     ),
 
@@ -481,7 +481,7 @@ local new(conf) = {
         labels + {component: nextcloudComponentName},
         nextcloudDeployment.metadata.labels,
         [
-            kube.servicePort("TCP", 80, 80),
+            kube.servicePort("http", "TCP", 80, 80),
         ],
     ),
 

@@ -12,7 +12,8 @@ local service(namespace, name, labels, selector, ports) = {
     },
 };
 
-local servicePort(protocol, port, targetPort) = {
+local servicePort(name, protocol, port, targetPort) = {
+    name: name,
     protocol: protocol,
     port: port,
     targetPort: targetPort,

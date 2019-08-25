@@ -79,7 +79,7 @@ local new(conf) = {
         labels + {component: motioneyeComponentName},
         motioneyeDeployment.metadata.labels,
         [
-            kube.servicePort("TCP", 80, 8765),
+            kube.servicePort("http", "TCP", 80, 8765),
         ],
     ) + {
         spec+: {

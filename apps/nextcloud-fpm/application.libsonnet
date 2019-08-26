@@ -1,571 +1,165 @@
 local kube = import "../../templates/kubernetes.libsonnet";
+local mariadbComponent = import "../../components/mariadb.libsonnet";
+local redisComponent = import "../../components/redis.libsonnet";
+local onlyofficeComponent = import "../../components/onlyoffice.libsonnet";
+local nextcloudComponent = import "../../components/nextcloud.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,
     local name = conf.kube.name,
     local labels = conf.kube.labels,
 
-    // Secret used by all components
-    local secret = kube.secret(
-        namespace, 
-        name,
-        labels,
-        stringData = {
-            NEXTCLOUD_ADMIN_USER: conf.app.nextcloud.adminUser,
-            NEXTCLOUD_ADMIN_PASSWORD: conf.app.nextcloud.adminPassword,
-        } + (
-            if conf.app.mariadb.use then {
-                MYSQL_ROOT_PASSWORD: conf.app.mariadb.rootPassword,
-                MYSQL_DATABASE: conf.app.mariadb.nextcloudDatabase,
-                MYSQL_USER: conf.app.mariadb.nextcloudUser,
-                MYSQL_PASSWORD: conf.app.mariadb.nextcloudUserPassword,
-            } else {}
-        ) + (
-            if conf.app.onlyoffice.use then {
-                JWT_SECRET: conf.app.onlyoffice.jwtSecret,
-            } else {}
-        ),
-    ),
-
     // MariaDB Component
-    local mariadbComponentName = "mariadb",
-    local mariadbDataDir = "data",
-
-    // MariaDB PersistentVolumes
-    local mariadbPersistentVolumes = {
-        data: kube.persistentVolume(
-            name + "-" + mariadbComponentName + "-" + mariadbDataDir,
-            labels + {component: mariadbComponentName},
-            conf.app.persistentData.expensive.nfsServer,
-            conf.app.persistentData.expensive.nfsRootPath + "/" + mariadbComponentName + "/" + mariadbDataDir,
-        ),
+    local mariadbConfig = mariadbComponent.configuration + {
+        kube+:: {
+            imageTag:: conf.app.mariadb.imageTag,
+            resources:: conf.kube.mariadb.resources,
+        },
+        app+:: {
+            rootPassword:: conf.app.mariadb.rootPassword,
+            user:: conf.app.mariadb.nextcloudUser,
+            userPassword:: conf.app.mariadb.nextcloudUserPassword,
+            database:: conf.app.mariadb.nextcloudDatabase,
+        },
+        data+:: {
+            persist:: conf.app.persistentData.use,
+            nfsVolumes+:: {
+                data+:: {
+                    nfsServer:: conf.app.persistentData.expensive.nfsServer,
+                    nfsPath:: conf.app.persistentData.expensive.nfsRootPath + "/mariadb/data",
+                },
+            },
+        },
     },
-
-    // MariaDB PersistentVolumeClaims
-    local mariadbPersistentVolumeClaims = {
-        data: kube.persistentVolumeClaim(
-            namespace,
-            mariadbPersistentVolumes.data.metadata.name,
-            labels + {component: mariadbComponentName},
-            mariadbPersistentVolumes.data.metadata.name,
-        ),
-    },
-
-    // MariaDB Deployment
-    local mariadbDeployment = kube.deployment(
-        namespace,
-        name + "-" + mariadbComponentName,
-        labels + {component: mariadbComponentName},
-        [
-            kube.deploymentContainer(
-                mariadbComponentName,
-                "mariadb",
-                conf.app.mariadb.imageTag,
-                env = [
-                    kube.containerEnvFromSecret("MYSQL_ROOT_PASSWORD", secret.metadata.name, "MYSQL_ROOT_PASSWORD"),
-                    kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
-                    kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
-                    kube.containerEnvFromSecret("MYSQL_DATABASE", secret.metadata.name, "MYSQL_DATABASE"),
-                ],
-                ports = [
-                    kube.containerPort(3306),
-                ],
-                volumeMounts = (
-                    if conf.app.persistentData.use then [
-                        kube.containerVolumeMount(mariadbDataDir, "/var/lib/mysql"),
-                    ] else []
-                ),
-                resources = conf.kube.mariadb.resources,
-            ),
-        ],
-        volumes = (
-            if conf.app.persistentData.use then [
-                kube.deploymentVolumePVC(mariadbDataDir, mariadbPersistentVolumeClaims.data.metadata.name),
-            ] else []
-        ),
-    ),
-
-    // MariaDB Service
-    local mariadbService = kube.service(
-        namespace,
-        name + "-" + mariadbComponentName,
-        labels + {component: mariadbComponentName},
-        mariadbDeployment.metadata.labels,
-        [
-            kube.servicePort("mysql", "TCP", 3306, 3306),
-        ],
-    ),
+    local mariadb = mariadbComponent.new(namespace, name, labels, 3306, mariadbConfig),
 
     // Redis Component
-    local redisComponentName = "redis",
-    local redisDataDir = "data",
-
-    // Redis PersistentVolumes
-    local redisPersistentVolumes = {
-        data: kube.persistentVolume(
-            name + "-" + redisComponentName + "-" + redisDataDir,
-            labels + {component: redisComponentName},
-            conf.app.persistentData.expensive.nfsServer,
-            conf.app.persistentData.expensive.nfsRootPath + "/" + redisComponentName + "/" + redisDataDir,
-        ),
+    local redisConfig = redisComponent.configuration + {
+        kube+:: {
+            imageTag:: conf.app.redis.imageTag,
+            resources:: conf.kube.redis.resources,
+        },
+        data+:: {
+            persist:: conf.app.persistentData.use,
+            nfsVolumes+:: {
+                data+:: {
+                    nfsServer:: conf.app.persistentData.expensive.nfsServer,
+                    nfsPath:: conf.app.persistentData.expensive.nfsRootPath + "/redis/data",
+                },
+            },
+        },
     },
-
-    // Redis PersistentVolumeClaims
-    local redisPersistentVolumeClaims = {
-        data: kube.persistentVolumeClaim(
-            namespace,
-            redisPersistentVolumes.data.metadata.name,
-            labels + {component: redisComponentName},
-            redisPersistentVolumes.data.metadata.name,
-        ),
-    },
-    
-    // Redis Deployment
-    local redisDeployment = kube.deployment(
-        namespace,
-        name + "-" + redisComponentName,
-        labels + {component: redisComponentName},
-        [
-            kube.deploymentContainer(
-                redisComponentName,
-                "redis",
-                conf.app.redis.imageTag,
-                ports = [
-                    kube.containerPort(6379),
-                ],
-                volumeMounts = (
-                    if conf.app.persistentData.use then [
-                        kube.containerVolumeMount(redisDataDir, "/data"),
-                    ] else []
-                ),
-                resources = conf.kube.redis.resources,
-            ),
-        ],
-        volumes = (
-            if conf.app.persistentData.use then [
-                kube.deploymentVolumePVC(redisDataDir, redisPersistentVolumeClaims.data.metadata.name),
-            ] else []
-        ),
-    ),
-
-    // Redis Service
-    local redisService = kube.service(
-        namespace,
-        name + "-" + redisComponentName,
-        labels + {component: redisComponentName},
-        redisDeployment.metadata.labels,
-        [
-            kube.servicePort("redis", "TCP", 6379, 6379),
-        ],
-    ),
+    local redis = redisComponent.new(namespace, name, labels, 6379, redisConfig),
 
     // Onlyoffice Component
-    local onlyofficeComponentName = "onlyoffice",
-
-    // Onlyoffice Deployment
-    local onlyofficeDeployment = kube.deployment(
-        namespace,
-        name + "-" + onlyofficeComponentName,
-        labels + {component: onlyofficeComponentName},
-        [
-            kube.deploymentContainer(
-                onlyofficeComponentName,
-                "onlyoffice/documentserver",
-                conf.app.onlyoffice.imageTag,
-                env = [
-                    kube.containerEnvFromValue("JWT_ENABLED", "true"),
-                    kube.containerEnvFromSecret("JWT_SECRET", secret.metadata.name, "JWT_SECRET"),
-                ],
-                ports = [
-                    kube.containerPort(80),
-                ],
-                resources = conf.kube.onlyoffice.resources,
-            ),
-        ],
-        volumes = (
-            if conf.app.persistentData.use then [
-                kube.deploymentVolumePVC(mariadbDataDir, mariadbPersistentVolumeClaims.data.metadata.name),
-            ] else []
-        ),
-    ),
-
-    // Onlyoffice Service
-    local onlyofficeService = kube.service(
-        namespace,
-        name + "-" + onlyofficeComponentName,
-        labels + {component: onlyofficeComponentName},
-        onlyofficeDeployment.metadata.labels,
-        [
-            kube.servicePort("http", "TCP", 80, 80),
-        ],
-    ),
-
-    // Onlyoffice Certificate
-    local onlyofficeCertificate = kube.certificate(
-        namespace,
-        name + "-" + onlyofficeComponentName,
-        labels + {component: onlyofficeComponentName},
-        "%(domain)s-tls" % {domain: std.strReplace(conf.app.onlyoffice.domain, ".", "-")},
-        conf.app.onlyoffice.domain,
-        {metadata: conf.kube.certificateIssuer},
-    ),
-
-    // Onlyoffice Ingress
-    local onlyofficeIngress = kube.ingress(
-        namespace,
-        name + "-" + onlyofficeComponentName,
-        labels + {component: onlyofficeComponentName},
-        tls = [
-            kube.ingressTls(
-                [conf.app.onlyoffice.domain],
-                "%(domain)s-tls" % {domain: std.strReplace(conf.app.onlyoffice.domain, ".", "-")}
-            ),
-        ],
-        rules = [
-            kube.ingressRule(
-                conf.app.onlyoffice.domain,
-                [
-                    kube.ingressRulePath(onlyofficeService.metadata.name, 80),
-                ],
-            ),
-        ],
-    ),
+    local onlyofficeConfig = onlyofficeComponent.configuration + {
+        kube+:: {
+            imageTag:: conf.app.onlyoffice.imageTag,
+            resources:: conf.kube.onlyoffice.resources,
+            certificateIssuer+:: {
+                name:: conf.kube.certificateIssuer.name,
+                kind:: conf.kube.certificateIssuer.kind,
+            },
+        },
+        app+:: {
+            jwtSecret:: conf.app.onlyoffice.jwtSecret,
+            domain:: conf.app.onlyoffice.domain,
+        },
+    },
+    local onlyoffice = onlyofficeComponent.new(namespace, name, labels, 80, onlyofficeConfig),
 
     // Nextcloud Component
-    local nextcloudComponentName = "nextcloud",
-    local nextcloudHtmlDir = "html",
-    local nextcloudCustomAppsDir = "custom-apps",
-    local nextcloudConfigDir = "config",
-    local nextcloudDataDir = "data",
-
-    // Nextcloud PersistentVolumes
-    local nextcloudPersistentVolumes = {
-        html: kube.persistentVolume(
-            name + "-" + nextcloudComponentName + "-" + nextcloudHtmlDir,
-            labels + {component: nextcloudComponentName},
-            conf.app.persistentData.expensive.nfsServer,
-            conf.app.persistentData.expensive.nfsRootPath + "/" + nextcloudComponentName + "/" + nextcloudHtmlDir,
-        ),
-        customApps: kube.persistentVolume(
-            name + "-" + nextcloudComponentName + "-" + nextcloudCustomAppsDir,
-            labels + {component: nextcloudComponentName},
-            conf.app.persistentData.expensive.nfsServer,
-            conf.app.persistentData.expensive.nfsRootPath + "/" + nextcloudComponentName + "/" + nextcloudCustomAppsDir,
-        ),
-        config: kube.persistentVolume(
-            name + "-" + nextcloudComponentName + "-" + nextcloudConfigDir,
-            labels + {component: nextcloudComponentName},
-            conf.app.persistentData.expensive.nfsServer,
-            conf.app.persistentData.expensive.nfsRootPath + "/" + nextcloudComponentName + "/" + nextcloudConfigDir,
-        ),
-        data: kube.persistentVolume(
-            name + "-" + nextcloudComponentName + "-" + nextcloudDataDir,
-            labels + {component: nextcloudComponentName},
-            conf.app.persistentData.cheap.nfsServer,
-            conf.app.persistentData.cheap.nfsRootPath + "/" + nextcloudComponentName + "/" + nextcloudDataDir,
-        ),
-    },
-
-    // Nextcloud PersistentVolumeClaims
-    local nextcloudPersistentVolumeClaims = {
-        html: kube.persistentVolumeClaim(
-            namespace,
-            nextcloudPersistentVolumes.html.metadata.name,
-            labels + {component: nextcloudComponentName},
-            nextcloudPersistentVolumes.html.metadata.name,
-        ),
-        customApps: kube.persistentVolumeClaim(
-            namespace,
-            nextcloudPersistentVolumes.customApps.metadata.name,
-            labels + {component: nextcloudComponentName},
-            nextcloudPersistentVolumes.customApps.metadata.name,
-        ),
-        config: kube.persistentVolumeClaim(
-            namespace,
-            nextcloudPersistentVolumes.config.metadata.name,
-            labels + {component: nextcloudComponentName},
-            nextcloudPersistentVolumes.config.metadata.name,
-        ),
-        data: kube.persistentVolumeClaim(
-            namespace,
-            nextcloudPersistentVolumes.data.metadata.name,
-            labels + {component: nextcloudComponentName},
-            nextcloudPersistentVolumes.data.metadata.name,
-        ),
-    },
-
-    // Nextcloud nginx ConfigMap
-    local nextcloudNginxConfigMap = kube.configMap(
-        namespace,
-        name + "-" + nextcloudComponentName + "-nginx",
-        labels + {component: nextcloudComponentName},
-        {
-            "fpm_nextcloud.conf": importstr "resources/fpm_nextcloud.conf",
+    local nextcloudConfig = nextcloudComponent.configuration + {
+        kube+:: {
+            nextcloud+:: {
+                imageTag:: conf.app.nextcloud.imageTag,
+                resources:: conf.kube.nextcloud.resources,
+            },
+            nginx+:: {
+                imageTag:: conf.app.nextcloud.nginx.imageTag,
+                resources:: conf.kube.nextcloud.nginx.resources,
+            },
+            certificateIssuer+:: {
+                name:: conf.kube.certificateIssuer.name,
+                kind:: conf.kube.certificateIssuer.kind,
+            },
         },
-    ),
-
-    // Nextcloud Deployment
-    local nextcloudDeployment = kube.deployment(
-        namespace,
-        name + "-" + nextcloudComponentName,
-        labels + {component: nextcloudComponentName},
-        [
-            kube.deploymentContainer(
-                nextcloudComponentName,
-                "nextcloud",
-                conf.app.nextcloud.imageTag,
-                env = [
-                    kube.containerEnvFromSecret("NEXTCLOUD_ADMIN_USER", secret.metadata.name, "NEXTCLOUD_ADMIN_USER"),
-                    kube.containerEnvFromSecret("NEXTCLOUD_ADMIN_PASSWORD", secret.metadata.name, "NEXTCLOUD_ADMIN_PASSWORD"),
-                    kube.containerEnvFromValue("NEXTCLOUD_TRUSTED_DOMAINS", conf.app.nextcloud.domain),
-                ] + (
-                    if conf.app.mariadb.use then [
-                        kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
-                        kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
-                        kube.containerEnvFromSecret("MYSQL_DATABASE", secret.metadata.name, "MYSQL_DATABASE"),
-                        kube.containerEnvFromValue("MYSQL_HOST", mariadbService.metadata.name),
-                    ] else [
-                        kube.containerEnvFromValue("SQLITE_DATABASE", "nextcloud"),
-                    ]
-                ) + (
-                    if conf.app.redis.use then [
-                        kube.containerEnvFromValue("REDIS_HOST", redisService.metadata.name),
-                        kube.containerEnvFromValue("REDIS_HOST_PORT", "6379"),
-                    ] else []
-                ),
-                volumeMounts = [
-                    kube.containerVolumeMount(nextcloudHtmlDir, "/var/www/html"),
-                    kube.containerVolumeMount(nextcloudCustomAppsDir, "/var/www/html/custom_apps"),
-                    kube.containerVolumeMount(nextcloudConfigDir, "/var/www/html/config"),
-                    kube.containerVolumeMount(nextcloudDataDir, "/var/www/html/data"),
-                ],
-                resources = conf.kube.nextcloud.resources,
-            ),
-            kube.deploymentContainer(
-                nextcloudComponentName + "-nginx",
-                "nginx",
-                conf.app.nextcloud.nginx.imageTag,
-                ports = [
-                    kube.containerPort(80),
-                ],
-                volumeMounts = [
-                    kube.containerVolumeMount("nginx", "/etc/nginx/conf.d"),
-                    kube.containerVolumeMount(nextcloudHtmlDir, "/var/www/html"),
-                    kube.containerVolumeMount(nextcloudCustomAppsDir, "/var/www/html/custom_apps"),
-                    kube.containerVolumeMount(nextcloudConfigDir, "/var/www/html/config"),
-                    kube.containerVolumeMount(nextcloudDataDir, "/var/www/html/data"),
-                ],
-                resources = conf.kube.nextcloud.nginx.resources,
-            ),
-        ],
-        initContainers = (
-            if conf.app.mariadb.use then [
-                kube.deploymentContainer(
-                    "init-mariadb",
-                    "mariadb",
-                    conf.app.mariadb.imageTag,
-                    command = [
-                        "sh",
-                        "-c",
-                        "until mysql -h %(service)s -u $MYSQL_USER --password=$MYSQL_PASSWORD -e 'SELECT 1'; do echo waiting for %(service)s; sleep 2; done;" % {service: mariadbService.metadata.name},
-                    ],
-                    env = [
-                        kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
-                        kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
-                    ],
-                    ports = [
-                        kube.containerPort(3306),
-                    ],
-                ),
-            ] else []
-        ) + (
-            if conf.app.redis.use then [
-                kube.deploymentContainer(
-                    "init-redis",
-                    "redis",
-                    conf.app.redis.imageTag,
-                    command = [
-                        "sh",
-                        "-c",
-                        "until redis-cli -h %(service)s -p 6379 ping; do echo waiting for %(service)s; sleep 2; done;" % {service: redisService.metadata.name},
-                    ],
-                ),
-            ] else []
-        ),
-        volumes = [
-            kube.deploymentVolumeConfigMap("nginx", nextcloudNginxConfigMap.metadata.name),
-        ] + (
-            if conf.app.persistentData.use then [
-                kube.deploymentVolumePVC(nextcloudHtmlDir, nextcloudPersistentVolumeClaims.html.metadata.name),
-                kube.deploymentVolumePVC(nextcloudCustomAppsDir, nextcloudPersistentVolumeClaims.customApps.metadata.name),
-                kube.deploymentVolumePVC(nextcloudConfigDir, nextcloudPersistentVolumeClaims.config.metadata.name),
-                kube.deploymentVolumePVC(nextcloudDataDir, nextcloudPersistentVolumeClaims.data.metadata.name),
-            ] else [
-                kube.deploymentVolumeEmptyDir(nextcloudHtmlDir),
-                kube.deploymentVolumeEmptyDir(nextcloudCustomAppsDir),
-                kube.deploymentVolumeEmptyDir(nextcloudConfigDir),
-                kube.deploymentVolumeEmptyDir(nextcloudDataDir),
-            ]
-        ),
-    ),
-
-    // Nextcloud CronJob
-    local nextcloudCronJob = kube.cronJob(
-        namespace,
-        name + "-" + nextcloudComponentName + "-cron",
-        labels + {component: nextcloudComponentName},
-        "*/15 * * * *",
-        [
-            kube.deploymentContainer(
-                nextcloudComponentName,
-                "nextcloud",
-                conf.app.nextcloud.imageTag,
-                command = [
-                    "su",
-                    "-p",
-                    "www-data",
-                    "-s",
-                    "/bin/sh",
-                    "-c", 
-                    "php -f /var/www/html/cron.php",
-                ],
-                volumeMounts = [
-                    kube.containerVolumeMount(nextcloudHtmlDir, "/var/www/html"),
-                    kube.containerVolumeMount(nextcloudCustomAppsDir, "/var/www/html/custom_apps"),
-                    kube.containerVolumeMount(nextcloudConfigDir, "/var/www/html/config"),
-                    kube.containerVolumeMount(nextcloudDataDir, "/var/www/html/data"),
-                ],
-                resources = conf.kube.nextcloud.cronJob.resources,
-            ),
-        ],
-        initContainers = (
-            if conf.app.mariadb.use then [
-                kube.deploymentContainer(
-                    "init-mariadb",
-                    "mariadb",
-                    conf.app.mariadb.imageTag,
-                    command = [
-                        "sh",
-                        "-c",
-                        "until mysql -h %(service)s -u $MYSQL_USER --password=$MYSQL_PASSWORD -e 'SELECT 1'; do echo waiting for %(service)s; sleep 2; done;" % {service: mariadbService.metadata.name},
-                    ],
-                    env = [
-                        kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
-                        kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
-                    ],
-                ),
-            ] else []
-        ) + (
-            if conf.app.redis.use then [
-                kube.deploymentContainer(
-                    "init-redis",
-                    "redis",
-                    conf.app.redis.imageTag,
-                    command = [
-                        "sh",
-                        "-c",
-                        "until redis-cli -h %(service)s -p 6379 ping; do echo waiting for %(service)s; sleep 2; done;" % {service: redisService.metadata.name},
-                    ],
-                ),
-            ] else []
-        ),
-        volumes = (
-            if conf.app.persistentData.use then [
-                kube.deploymentVolumePVC(nextcloudHtmlDir, nextcloudPersistentVolumeClaims.html.metadata.name),
-                kube.deploymentVolumePVC(nextcloudCustomAppsDir, nextcloudPersistentVolumeClaims.customApps.metadata.name),
-                kube.deploymentVolumePVC(nextcloudConfigDir, nextcloudPersistentVolumeClaims.config.metadata.name),
-                kube.deploymentVolumePVC(nextcloudDataDir, nextcloudPersistentVolumeClaims.data.metadata.name),
-            ] else []
-        ),
-    ),
-
-    // Nextcloud Service
-    local nextcloudService = kube.service(
-        namespace,
-        name + "-" + nextcloudComponentName,
-        labels + {component: nextcloudComponentName},
-        nextcloudDeployment.metadata.labels,
-        [
-            kube.servicePort("http", "TCP", 80, 80),
-        ],
-    ),
-
-    // Nextcloud Certificate
-    local nextcloudCertificate = kube.certificate(
-        namespace,
-        name + "-" + nextcloudComponentName,
-        labels + {component: nextcloudComponentName},
-        "%(domain)s-tls" % {domain: std.strReplace(conf.app.nextcloud.domain, ".", "-")},
-        conf.app.nextcloud.domain,
-        {metadata: conf.kube.certificateIssuer},
-    ),
-
-    // Nextcloud Ingress
-    local nextcloudIngress = kube.ingress(
-        namespace,
-        name + "-" + nextcloudComponentName,
-        labels + {component: nextcloudComponentName},
-        tls = [
-            kube.ingressTls(
-                [conf.app.nextcloud.domain],
-                "%(domain)s-tls" % {domain: std.strReplace(conf.app.nextcloud.domain, ".", "-")}
-            ),
-        ],
-        rules = [
-            kube.ingressRule(
-                conf.app.nextcloud.domain,
-                [
-                    kube.ingressRulePath(nextcloudService.metadata.name, 80),
-                ],
-            ),
-        ],
-    ),
+        app+:: {
+            adminUser:: conf.app.nextcloud.adminUser,
+            adminPassword:: conf.app.nextcloud.adminPassword,
+            domain:: conf.app.nextcloud.domain,
+        },
+        data:: {
+            persist:: conf.app.persistentData.use,
+            nfsVolumes:: {
+                html:: {
+                    nfsServer:: conf.app.persistentData.expensive.nfsServer,
+                    nfsPath:: conf.app.persistentData.expensive.nfsRootPath + "/nextcloud/html",
+                },
+                customApps:: {
+                    nfsServer:: conf.app.persistentData.expensive.nfsServer,
+                    nfsPath:: conf.app.persistentData.expensive.nfsRootPath + "/nextcloud/custom-apps",
+                },
+                config:: {
+                    nfsServer:: conf.app.persistentData.expensive.nfsServer,
+                    nfsPath:: conf.app.persistentData.expensive.nfsRootPath + "/nextcloud/config",
+                },
+                data:: {
+                    nfsServer:: conf.app.persistentData.cheap.nfsServer,
+                    nfsPath:: conf.app.persistentData.cheap.nfsRootPath + "/redis/data",
+                },
+            },
+        },
+    },
+    local nextcloud = nextcloudComponent.new(namespace, name, labels, 80, nextcloudConfig),
 
     apiVersion: "v1",
     kind: "List",
     items: [
-        secret,
-        nextcloudNginxConfigMap,
-        nextcloudDeployment,
-        nextcloudService,
-        nextcloudCertificate,
-        nextcloudIngress,
+        nextcloud.secret,
+        nextcloud.nginxConfigMap,
+        nextcloud.service,
+        nextcloud.deployment,
+        nextcloud.certificate,
+        nextcloud.ingress,
     ] + (
         if conf.app.persistentData.use then [
-            nextcloudPersistentVolumes[x] for x in std.objectFields(nextcloudPersistentVolumes)
+            nextcloud.persistentVolumes[x] for x in std.objectFields(nextcloud.persistentVolumes)
         ] + [
-            nextcloudPersistentVolumeClaims[x] for x in std.objectFields(nextcloudPersistentVolumeClaims)  
+            nextcloud.persistentVolumeClaims[x] for x in std.objectFields(nextcloud.persistentVolumeClaims)  
         ] + [
-            nextcloudCronJob,
+            nextcloud.cronJob,
         ] else []
     ) + (
         if conf.app.mariadb.use then [
-            mariadbDeployment,
-            mariadbService,
+            mariadb.secret,
+            mariadb.service,
+            mariadb.deployment,
         ] + (
             if conf.app.persistentData.use then [
-                mariadbPersistentVolumes[x] for x in std.objectFields(mariadbPersistentVolumes)
+                mariadb.persistentVolumes[x] for x in std.objectFields(mariadb.persistentVolumes)
             ] + [
-                mariadbPersistentVolumeClaims[x] for x in std.objectFields(mariadbPersistentVolumeClaims)  
+                mariadb.persistentVolumeClaims[x] for x in std.objectFields(mariadb.persistentVolumeClaims)  
             ] else []
         ) else []
     ) + (
         if conf.app.redis.use then [
-            redisDeployment,
-            redisService,
+            redis.service,
+            redis.deployment,
         ] + (
             if conf.app.persistentData.use then [
-                redisPersistentVolumes[x] for x in std.objectFields(redisPersistentVolumes)
+                redis.persistentVolumes[x] for x in std.objectFields(redis.persistentVolumes)
             ] + [
-                redisPersistentVolumeClaims[x] for x in std.objectFields(redisPersistentVolumeClaims)  
+                redis.persistentVolumeClaims[x] for x in std.objectFields(redis.persistentVolumeClaims)  
             ] else []
         ) else []
     ) + (
         if conf.app.onlyoffice.use then [
-            onlyofficeDeployment,
-            onlyofficeService,
-            onlyofficeCertificate,
-            onlyofficeIngress,
+            onlyoffice.secret,
+            onlyoffice.service,
+            onlyoffice.deployment,
+            onlyoffice.certificate,
+            onlyoffice.ingress,
         ] else []
     ),
 };

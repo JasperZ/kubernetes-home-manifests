@@ -1,4 +1,6 @@
 local kube = import "../../templates/kubernetes.libsonnet";
+local influxdbComponent = import "../../components/influxdb.libsonnet";
+local mariadbComponent = import "../../components/mariadb.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,
@@ -31,148 +33,55 @@ local new(conf) = {
     ),
 
     // influxdb Component
-    local influxdbComponentName = "influxdb",
-    local influxdbDataDir = "data",
-
-    // influxdb PersistentVolumes
-    local influxdbPersistentVolumes = {
-        data: kube.persistentVolume(
-            name + "-" + influxdbComponentName + "-" + influxdbDataDir,
-            labels + {component: influxdbComponentName},
-            conf.app.persistentData.expensive.nfsServer,
-            conf.app.persistentData.expensive.nfsRootPath + "/" + influxdbComponentName + "/" + influxdbDataDir,
-        ),
+    local influxdbConfig = influxdbComponent.configuration + {
+        kube+:: {
+            imageTag:: conf.app.influxdb.imageTag,
+            resources:: conf.kube.influxdb.resources,
+        },
+        app+:: {
+            adminUser:: conf.app.influxdb.adminUser,
+            adminUserPassword:: conf.app.influxdb.adminUserPassword,
+            writeUser:: conf.app.influxdb.writeUser,
+            writeUserPassword:: conf.app.influxdb.writeUserPassword,
+            readUser:: conf.app.influxdb.readUser,
+            readUserPassword:: conf.app.influxdb.readUserPassword,
+            database:: conf.app.influxdb.database,
+        },
+        data+:: {
+            persist:: conf.app.persistentData.use,
+            nfsVolumes+:: {
+                data+:: {
+                    nfsServer:: conf.app.persistentData.expensive.nfsServer,
+                    nfsPath:: conf.app.persistentData.expensive.nfsRootPath + "/influxdb/data",
+                },
+            },
+        },
     },
-
-    // influxdb PersistentVolumeClaims
-    local influxdbPersistentVolumeClaims = {
-        data: kube.persistentVolumeClaim(
-            namespace,
-            influxdbPersistentVolumes.data.metadata.name,
-            labels + {component: influxdbComponentName},
-            influxdbPersistentVolumes.data.metadata.name,
-        ),
-    },
-    
-    // influxdb Deployment
-    local influxdbDeployment = kube.deployment(
-        namespace,
-        name + "-" + influxdbComponentName,
-        labels + {component: influxdbComponentName},
-        [
-            kube.deploymentContainer(
-                influxdbComponentName,
-                "influxdb",
-                conf.app.influxdb.imageTag,
-                env = [
-                    kube.containerEnvFromValue("INFLUXDB_HTTP_AUTH_ENABLED", "true"),
-                    kube.containerEnvFromValue("INFLUXDB_HOST", influxdbService.metadata.name),
-
-                    kube.containerEnvFromSecret("INFLUXDB_DB", secret.metadata.name, "INFLUXDB_DB"),
-                    kube.containerEnvFromSecret("INFLUXDB_ADMIN_USER", secret.metadata.name, "INFLUXDB_ADMIN_USER"),
-                    kube.containerEnvFromSecret("INFLUXDB_ADMIN_PASSWORD", secret.metadata.name, "INFLUXDB_ADMIN_PASSWORD"),
-                    kube.containerEnvFromSecret("INFLUXDB_WRITE_USER", secret.metadata.name, "INFLUXDB_WRITE_USER"),
-                    kube.containerEnvFromSecret("INFLUXDB_WRITE_USER_PASSWORD", secret.metadata.name, "INFLUXDB_WRITE_USER_PASSWORD"),
-                    kube.containerEnvFromSecret("INFLUXDB_READ_USER", secret.metadata.name, "INFLUXDB_READ_USER"),
-                    kube.containerEnvFromSecret("INFLUXDB_READ_USER_PASSWORD", secret.metadata.name, "INFLUXDB_READ_USER_PASSWORD"),
-                ],
-                ports = [
-                    kube.containerPort(8086),
-                ],
-                volumeMounts = (
-                    if conf.app.persistentData.use then [
-                        kube.containerVolumeMount(influxdbDataDir, "/var/lib/influxdb"),
-                    ] else []
-                ),
-                resources = conf.kube.influxdb.resources,
-            ),
-        ],
-        volumes = (
-            if conf.app.persistentData.use then [
-                kube.deploymentVolumePVC(influxdbDataDir, influxdbPersistentVolumeClaims.data.metadata.name),
-            ] else []
-        ),
-    ),
-
-    // influxdb Service
-    local influxdbService = kube.service(
-        namespace,
-        name + "-" + influxdbComponentName,
-        labels + {component: influxdbComponentName},
-        influxdbDeployment.metadata.labels,
-        [
-            kube.servicePort("http", "TCP", 8086, 8086),
-        ],
-    ),
+    local influxdb = influxdbComponent.new(namespace, name, labels, 8086, influxdbConfig),
 
     // mariadb Component
-    local mariadbComponentName = "mariadb",
-    local mariadbDataDir = "data",
-
-    // mariadb PersistentVolumes
-    local mariadbPersistentVolumes = {
-        data: kube.persistentVolume(
-            name + "-" + mariadbComponentName + "-" + mariadbDataDir,
-            labels + {component: mariadbComponentName},
-            conf.app.persistentData.expensive.nfsServer,
-            conf.app.persistentData.expensive.nfsRootPath + "/" + mariadbComponentName + "/" + mariadbDataDir,
-        ),
+    local mariadbConfig = mariadbComponent.configuration + {
+        kube+:: {
+            imageTag:: conf.app.mariadb.imageTag,
+            resources:: conf.kube.mariadb.resources,
+        },
+        app+:: {
+            rootPassword:: conf.app.mariadb.rootPassword,
+            user:: conf.app.mariadb.homeassistantUser,
+            userPassword:: conf.app.mariadb.homeassistantUserPassword,
+            database:: conf.app.mariadb.homeassistantDatabase,
+        },
+        data+:: {
+            persist:: conf.app.persistentData.use,
+            nfsVolumes+:: {
+                data+:: {
+                    nfsServer:: conf.app.persistentData.expensive.nfsServer,
+                    nfsPath:: conf.app.persistentData.expensive.nfsRootPath + "/mariadb/data",
+                },
+            },
+        },
     },
-
-    // mariadb PersistentVolumeClaims
-    local mariadbPersistentVolumeClaims = {
-        data: kube.persistentVolumeClaim(
-            namespace,
-            mariadbPersistentVolumes.data.metadata.name,
-            labels + {component: mariadbComponentName},
-            mariadbPersistentVolumes.data.metadata.name,
-        ),
-    },
-
-    // mariadb Deployment
-    local mariadbDeployment = kube.deployment(
-        namespace,
-        name + "-" + mariadbComponentName,
-        labels + {component: mariadbComponentName},
-        [
-            kube.deploymentContainer(
-                mariadbComponentName,
-                "mariadb",
-                conf.app.mariadb.imageTag,
-                env = [
-                    kube.containerEnvFromSecret("MYSQL_ROOT_PASSWORD", secret.metadata.name, "MYSQL_ROOT_PASSWORD"),
-                    kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
-                    kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
-                    kube.containerEnvFromSecret("MYSQL_DATABASE", secret.metadata.name, "MYSQL_DATABASE"),
-                ],
-                ports = [
-                    kube.containerPort(3306),
-                ],
-                volumeMounts = (
-                    if conf.app.persistentData.use then [
-                        kube.containerVolumeMount(mariadbDataDir, "/var/lib/mysql"),
-                    ] else []
-                ),
-                resources = conf.kube.mariadb.resources,
-            ),
-        ],
-        volumes = (
-            if conf.app.persistentData.use then [
-                kube.deploymentVolumePVC(mariadbDataDir, mariadbPersistentVolumeClaims.data.metadata.name),
-            ] else []
-        ),
-    ),
-
-    // mariadb Service
-    local mariadbService = kube.service(
-        namespace,
-        name + "-" + mariadbComponentName,
-        labels + {component: mariadbComponentName},
-        mariadbDeployment.metadata.labels,
-        [
-            kube.servicePort("mysql", "TCP", 3306, 3306),
-        ],
-    ),
+    local mariadb = mariadbComponent.new(namespace, name, labels, 3306, mariadbConfig),
 
     // nodered Component
     local noderedComponentName = "nodered",
@@ -297,7 +206,7 @@ local new(conf) = {
                     command = [
                         "sh",
                         "-c",
-                        "until curl -sL -I %(service)s:8086/ping; do echo waiting for %(service)s; sleep 2; done;" % {service: influxdbService.metadata.name},
+                        "until curl -sL -I %(service)s:8086/ping; do echo waiting for %(service)s; sleep 2; done;" % {service: influxdb.service.metadata.name},
                     ],
                 ),
             ] else []
@@ -310,7 +219,7 @@ local new(conf) = {
                     command = [
                         "sh",
                         "-c",
-                        "until mysql -h %(service)s -u $MYSQL_USER --password=$MYSQL_PASSWORD -e 'SELECT 1'; do echo waiting for %(service)s; sleep 2; done;" % {service: mariadbService.metadata.name},
+                        "until mysql -h %(service)s -u $MYSQL_USER --password=$MYSQL_PASSWORD -e 'SELECT 1'; do echo waiting for %(service)s; sleep 2; done;" % {service: mariadb.service.metadata.name},
                     ],
                     env = [
                         kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
@@ -387,24 +296,24 @@ local new(conf) = {
         ] else []
     ) + (
         if conf.app.influxdb.use then [
-            influxdbService,
-            influxdbDeployment,
+            influxdb.service,
+            influxdb.deployment,
         ] + (
             if conf.app.persistentData.use then [
-                influxdbPersistentVolumes[x] for x in std.objectFields(influxdbPersistentVolumes)
+                influxdb.persistentVolumes[x] for x in std.objectFields(influxdb.persistentVolumes)
             ] + [
-                influxdbPersistentVolumeClaims[x] for x in std.objectFields(influxdbPersistentVolumeClaims)  
+                influxdb.persistentVolumeClaims[x] for x in std.objectFields(influxdb.persistentVolumeClaims)  
             ] else []
         ) else []
     ) + (
         if conf.app.mariadb.use then [
-            mariadbService,
-            mariadbDeployment,
+            mariadb.service,
+            mariadb.deployment,
         ] + (
             if conf.app.persistentData.use then [
-                mariadbPersistentVolumes[x] for x in std.objectFields(mariadbPersistentVolumes)
+                mariadb.persistentVolumes[x] for x in std.objectFields(mariadb.persistentVolumes)
             ] + [
-                mariadbPersistentVolumeClaims[x] for x in std.objectFields(mariadbPersistentVolumeClaims)  
+                mariadb.persistentVolumeClaims[x] for x in std.objectFields(mariadb.persistentVolumeClaims)  
             ] else []
         ) else []
     ) + (

@@ -376,11 +376,6 @@ local new(conf) = {
                     ports = [
                         kube.containerPort(3306),
                     ],
-                    volumeMounts = (
-                        if conf.app.persistentData.use then [
-                            kube.containerVolumeMount(mariadbDataDir, "/var/lib/mysql"),
-                        ] else []
-                    ),
                 ),
             ] else []
         ) + (

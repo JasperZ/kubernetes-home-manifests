@@ -50,7 +50,27 @@ local certificate(namespace, name, labels, secretName, dnsName, issuer) = {
     },
 };
 
-local ingress(namespace, name, labels, secretName, dnsName, targetService, targetPort) = {
+local ingressTls(hosts, secretName) = {
+    hosts: hosts,
+    secretName: secretName,
+};
+
+local ingressRulePath(serviceName, servicePort, path=null) = {
+    [if path != null then "path"]: path,
+    backend: {
+        serviceName: serviceName,
+        servicePort: servicePort,
+    },
+};
+
+local ingressRule(host, paths) = {
+    host: host,
+    http: {
+        paths: paths,
+    },
+};
+
+local ingress(namespace, name, labels, tls=[], rules=[]) = {
     apiVersion: "networking.k8s.io/v1beta1",
     kind: "Ingress",
     metadata: {
@@ -63,29 +83,8 @@ local ingress(namespace, name, labels, secretName, dnsName, targetService, targe
         },
     },
     spec: {
-        tls: [
-            {
-                hosts: [
-                    dnsName,
-                ],
-                secretName: secretName,
-            },
-        ],
-        rules: [
-            {
-                host: dnsName,
-                http: {
-                    paths: [
-                        {
-                            backend: {
-                                serviceName: targetService,
-                                servicePort: targetPort,
-                            },
-                        },
-                    ],
-                },
-            },
-        ],
+        tls: tls,
+        rules: rules,
     },
 };
 
@@ -271,6 +270,9 @@ local containerVolumeMount(name, mountPath) = {
     servicePort:: servicePort,
     resources:: resources,
     certificate:: certificate,
+    ingressTls:: ingressTls,
+    ingressRulePath:: ingressRulePath,
+    ingressRule:: ingressRule,
     ingress:: ingress,
     secret:: secret,
     persistentVolume:: persistentVolume,

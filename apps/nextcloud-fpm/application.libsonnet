@@ -215,10 +215,20 @@ local new(conf) = {
         namespace,
         name + "-" + onlyofficeComponentName,
         labels + {component: onlyofficeComponentName},
-        "%(domain)s-tls" % {domain: std.strReplace(conf.app.onlyoffice.domain, ".", "-")},
-        conf.app.onlyoffice.domain,
-        onlyofficeService.metadata.name,
-        80,
+        tls = [
+            kube.ingressTls(
+                [conf.app.onlyoffice.domain],
+                "%(domain)s-tls" % {domain: std.strReplace(conf.app.onlyoffice.domain, ".", "-")}
+            ),
+        ],
+        rules = [
+            kube.ingressRule(
+                conf.app.onlyoffice.domain,
+                [
+                    kube.ingressRulePath(onlyofficeService.metadata.name, 80),
+                ],
+            ),
+        ],
     ),
 
     // Nextcloud Component
@@ -500,10 +510,20 @@ local new(conf) = {
         namespace,
         name + "-" + nextcloudComponentName,
         labels + {component: nextcloudComponentName},
-        "%(domain)s-tls" % {domain: std.strReplace(conf.app.nextcloud.domain, ".", "-")},
-        conf.app.nextcloud.domain,
-        nextcloudService.metadata.name,
-        80,
+        tls = [
+            kube.ingressTls(
+                [conf.app.nextcloud.domain],
+                "%(domain)s-tls" % {domain: std.strReplace(conf.app.nextcloud.domain, ".", "-")}
+            ),
+        ],
+        rules = [
+            kube.ingressRule(
+                conf.app.nextcloud.domain,
+                [
+                    kube.ingressRulePath(nextcloudService.metadata.name, 80),
+                ],
+            ),
+        ],
     ),
 
     apiVersion: "v1",

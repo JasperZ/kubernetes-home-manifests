@@ -6,11 +6,11 @@ local configuration = {
             imageTag:: error "kube.nextcloud.imageTag is required",
             resources:: {
                 requests:: {
-                    cpu:: "125m",
+                    cpu:: "150m",
                     memory:: "100Mi",
                 },
                 limits:: {
-                    cpu:: "500m",
+                    cpu:: "200m",
                     memory:: "200Mi",
                 },
             },
@@ -19,11 +19,11 @@ local configuration = {
             imageTag:: error "kube.nginx.imageTag is required",
             resources:: {
                 requests:: {
-                    cpu:: "125m",
+                    cpu:: "40m",
                     memory:: "15Mi",
                 },
                 limits:: {
-                    cpu:: "500m",
+                    cpu:: "80m",
                     memory:: "30Mi",
                 },
             },

@@ -5,11 +5,11 @@ local configuration = {
         imageTag:: error "kube.imageTag is required",
         resources:: {
             requests:: {
-                cpu:: "125m",
+                cpu:: "200m",
                 memory:: "200Mi",
             },
             limits:: {
-                cpu:: "500m",
+                cpu:: "400m",
                 memory:: "350Mi",
             },
         },

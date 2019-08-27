@@ -236,7 +236,7 @@
         onlyoffice: {
             use: $.application.onlyoffice.use,
         } + (
-            if $.application.redis.use then {
+            if $.application.onlyoffice.use then {
                 imageTag: $.application.onlyoffice.imageTag,
                 jwtSecret: $.application.onlyoffice.jwtSecret,
                 domain: $.application.onlyoffice.domain,

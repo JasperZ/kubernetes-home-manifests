@@ -1,4 +1,4 @@
-local crawlerComponent = import "../../components/crawler.libsonnet";
+local crawlerComponent = import "../../components/bitfinexCrawler.libsonnet";
 local influxdbComponent = import "../../components/influxdb.libsonnet";
 
 {

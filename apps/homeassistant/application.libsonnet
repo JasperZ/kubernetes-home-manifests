@@ -1,6 +1,7 @@
 local kube = import "../../templates/kubernetes.libsonnet";
 local influxdbComponent = import "../../components/influxdb.libsonnet";
 local mariadbComponent = import "../../components/mariadb.libsonnet";
+local noderedComponent = import "../../components/nodered.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,
@@ -84,76 +85,26 @@ local new(conf) = {
     local mariadb = mariadbComponent.new(namespace, name, labels, 3306, mariadbConfig),
 
     // nodered Component
-    local noderedComponentName = "nodered",
-    local noderedDataDir = "data",
-
-    // nodered PersistentVolumes
-    local noderedPersistentVolumes = {
-        data: kube.persistentVolume(
-            name + "-" + noderedComponentName + "-" + noderedDataDir,
-            labels + {component: noderedComponentName},
-            conf.app.persistentData.expensive.nfsServer,
-            conf.app.persistentData.expensive.nfsRootPath + "/" + noderedComponentName + "/" + noderedDataDir,
-        ),
-    },
-
-    // nodered PersistentVolumeClaims
-    local noderedPersistentVolumeClaims = {
-        data: kube.persistentVolumeClaim(
-            namespace,
-            noderedPersistentVolumes.data.metadata.name,
-            labels + {component: noderedComponentName},
-            noderedPersistentVolumes.data.metadata.name,
-        ),
-    },
-    
-    // nodered Deployment
-    local noderedDeployment = kube.deployment(
-        namespace,
-        name + "-" + noderedComponentName,
-        labels + {component: noderedComponentName},
-        [
-            kube.deploymentContainer(
-                noderedComponentName,
-                "nodered/node-red-docker",
-                conf.app.nodered.imageTag,
-                env = [
-                    kube.containerEnvFromValue("TZ", "Europe/Berlin"),
-                ],
-                ports = [
-                    kube.containerPort(1880),
-                ],
-                volumeMounts = (
-                    if conf.app.persistentData.use then [
-                        kube.containerVolumeMount(noderedDataDir, "/data"),
-                    ] else []
-                ),
-                resources = conf.kube.nodered.resources,
-            ),
-        ],
-        volumes = (
-            if conf.app.persistentData.use then [
-                kube.deploymentVolumePVC(noderedDataDir, noderedPersistentVolumeClaims.data.metadata.name),
-            ] else []
-        ),
-    ),
-
-    // nodered Service
-    local noderedService = kube.service(
-        namespace,
-        name + "-" + noderedComponentName,
-        labels + {component: noderedComponentName},
-        noderedDeployment.metadata.labels,
-        [
-            kube.servicePort("http", "TCP", 80, 1880),
-        ],
-    ) + {
-        spec+: {
-            type: "LoadBalancer", 
-            loadBalancerIP: conf.app.nodered.ip,
-            externalTrafficPolicy: "Local",
+    local noderedConfig = noderedComponent.configuration + {
+        kube+:: {
+            imageTag:: conf.app.nodered.imageTag,
+            resources:: conf.kube.nodered.resources,
+        },
+        app+:: {
+            timezone:: "Europe/Berlin",
+            ip:: conf.app.nodered.ip,
+        },
+        data+:: {
+            persist:: conf.app.persistentData.use,
+            nfsVolumes+:: {
+                data+:: {
+                    nfsServer:: conf.app.persistentData.expensive.nfsServer,
+                    nfsPath:: conf.app.persistentData.expensive.nfsRootPath + "/mariadb/data",
+                },
+            },
         },
     },
+    local nodered = noderedComponent.new(namespace, name, labels, 80, noderedConfig),
 
     // homeassistant Component
     local homeassistantComponentName = "homeassistant",
@@ -321,13 +272,13 @@ local new(conf) = {
         ) else []
     ) + (
         if conf.app.nodered.use then [
-            noderedService,
-            noderedDeployment,
+            nodered.service,
+            nodered.deployment,
         ] + (
             if conf.app.persistentData.use then [
-                noderedPersistentVolumes[x] for x in std.objectFields(noderedPersistentVolumes)
+                nodered.persistentVolumes[x] for x in std.objectFields(nodered.persistentVolumes)
             ] + [
-                noderedPersistentVolumeClaims[x] for x in std.objectFields(noderedPersistentVolumeClaims)  
+                nodered.persistentVolumeClaims[x] for x in std.objectFields(nodered.persistentVolumeClaims)  
             ] else []
         ) else []
     ),

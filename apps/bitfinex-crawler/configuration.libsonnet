@@ -1,19 +1,13 @@
+local crawlerComponent = import "../../components/crawler.libsonnet";
+local influxdbComponent = import "../../components/influxdb.libsonnet";
+
 {
     kubernetes:: {
         namespace:: error "namespace is required",
         appNamePrefix:: error "namePrefix is required",
         labels:: error "labels is required",
         crawler:: {
-            resources:: {
-                requests:: {
-                    cpu:: "250m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: crawlerComponent.configuration.kube.resources,
             curl:: {
                 resources:: {
                     requests:: {
@@ -28,16 +22,7 @@
             },
         },
         influxdb:: {
-            resources:: {
-                requests:: {
-                    cpu:: "250m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: influxdbComponent.configuration.kube.resources,
         },
     },
     application:: {

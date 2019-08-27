@@ -1,19 +1,12 @@
+local urbackupComponent = import "../../components/urbackup.libsonnet";
+
 {
     kubernetes:: {
         namespace:: error "namespace is required",
         appNamePrefix:: error "namePrefix is required",
         labels:: error "labels is required",
         urbackup:: {
-            resources:: {
-                requests:: {
-                    cpu:: "125m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "250m",
-                    memory:: "256Mi",
-                },
-            },
+            resources:: urbackupComponent.configuration.kube.resources,
         },
     },
     application:: {

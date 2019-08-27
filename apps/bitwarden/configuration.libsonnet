@@ -1,3 +1,5 @@
+local bitwardenComponent = import "../../components/bitwarden.libsonnet";
+
 {
     kubernetes:: {
         namespace:: error "namespace is required",
@@ -8,16 +10,7 @@
             kind:: error "certificateIssuer.kind is required",
         },
         bitwarden:: {
-            resources:: {
-                requests:: {
-                    cpu:: "250m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: bitwardenComponent.configuration.kube.resources,
         },
     },
     application:: {

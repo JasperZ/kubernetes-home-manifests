@@ -1,19 +1,12 @@
+local motioneyeComponent = import "../../components/motioneye.libsonnet";
+
 {
     kubernetes:: {
         namespace:: error "namespace is required",
         appNamePrefix:: error "namePrefix is required",
         labels:: error "labels is required",
         motioneye:: {
-            resources:: {
-                requests:: {
-                    cpu:: "250m",
-                    memory:: "256Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: motioneyeComponent.configuration.kube.resources,
         },
     },
     application:: {

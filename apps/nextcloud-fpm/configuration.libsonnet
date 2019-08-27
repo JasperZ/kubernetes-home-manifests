@@ -1,3 +1,8 @@
+local nextcloudComponent = import "../../components/nextcloud.libsonnet";
+local mariadbComponent = import "../../components/mariadb.libsonnet";
+local redisComponent = import "../../components/redis.libsonnet";
+local onlyofficeComponent = import "../../components/onlyoffice.libsonnet";
+
 {
     kubernetes:: {
         namespace:: error "namespace is required",
@@ -8,27 +13,9 @@
             kind:: error "certificateIssuer.kind is required",
         },
         nextcloud:: {
-            resources:: {
-                requests:: {
-                    cpu:: "250m",
-                    memory:: "256Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: nextcloudComponent.configuration.kube.nextcloud.resources,
             nginx:: {
-                resources:: {
-                    requests:: {
-                        cpu:: "125m",
-                        memory:: "128Mi",
-                    },
-                    limits:: {
-                        cpu:: "250m",
-                        memory:: "256Mi",
-                    },
-                },
+                resources:: nextcloudComponent.configuration.kube.nginx.resources,
             },
             cronJob::{
                 resources:: {
@@ -44,40 +31,13 @@
             },
         },
         mariadb:: {
-            resources:: {
-                requests:: {
-                    cpu:: "125m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: mariadbComponent.configuration.kube.resources,
         },
         redis:: {
-            resources:: {
-                requests:: {
-                    cpu:: "125m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "250m",
-                    memory:: "256Mi",
-                },
-            },
+            resources:: redisComponent.configuration.kube.resources,
         },
         onlyoffice:: {
-            resources:: {
-                requests:: {
-                    cpu:: "250m",
-                    memory:: "256Mi",
-                },
-                limits:: {
-                    cpu:: "1000m",
-                    memory:: "1024Mi",
-                },
-            },
+            resources:: onlyofficeComponent.configuration.kube.resources,
         },
     },
     application:: {

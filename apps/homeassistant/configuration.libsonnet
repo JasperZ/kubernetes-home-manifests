@@ -1,3 +1,8 @@
+local influxdbComponent = import "../../components/influxdb.libsonnet";
+local mariadbComponent = import "../../components/mariadb.libsonnet";
+local noderedComponent = import "../../components/nodered.libsonnet";
+local homeassistantComponent = import "../../components/homeassistant.libsonnet";
+
 {
     kubernetes:: {
         namespace:: error "namespace is required",
@@ -8,52 +13,16 @@
             kind:: error "certificateIssuer.kind is required",
         },
         homeassistant:: {
-            resources:: {
-                requests:: {
-                    cpu:: "125m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: homeassistantComponent.configuration.kube.resources,
         },
         nodered:: {
-            resources:: {
-                requests:: {
-                    cpu:: "125m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "250m",
-                    memory:: "256Mi",
-                },
-            },
+            resources:: noderedComponent.configuration.kube.resources,
         },
         influxdb:: {
-            resources:: {
-                requests:: {
-                    cpu:: "250m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: influxdbComponent.configuration.kube.resources,
         },
         mariadb:: {
-            resources:: {
-                requests:: {
-                    cpu:: "125m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "500m",
-                    memory:: "512Mi",
-                },
-            },
+            resources:: mariadbComponent.configuration.kube.resources,
         },
     },
     application:: {

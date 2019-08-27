@@ -1,19 +1,12 @@
+local ddclientComponent = import "../../components/ddclient.libsonnet";
+
 {
     kubernetes:: {
         namespace:: error "namespace is required",
         appNamePrefix:: error "namePrefix is required",
         labels:: error "labels is required",
         ddclient:: {
-            resources:: {
-                requests:: {
-                    cpu:: "125m",
-                    memory:: "128Mi",
-                },
-                limits:: {
-                    cpu:: "125m",
-                    memory:: "128Mi",
-                },
-            },
+            resources:: ddclientComponent.configuration.kube.resources,
         },
     },
     application:: {

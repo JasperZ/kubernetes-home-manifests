@@ -32,12 +32,7 @@ local new(conf) = {
             },
         },
     },
-    local influxdb = influxdbComponent.new(namespace, name, labels, 8086, influxdbConfig),
-    local influxdbSecret = influxdb.secret,
-    local influxdbPersistentVolumes = influxdb.persistentVolumes,
-    local influxdbPersistentVolumeClaims = influxdb.persistentVolumeClaims,
-    local influxdbService = influxdb.service,
-    local influxdbDeployment = influxdb.deployment,
+    local influxdb = influxdbComponent.new(namespace, name, labels, influxdbConfig),
 
     // crawler Component
     local crawlerConfig = bitfinexCrawlerComponent.configuration + {
@@ -50,20 +45,19 @@ local new(conf) = {
         },
     },
     local crawler = bitfinexCrawlerComponent.new(namespace, name, labels, crawlerConfig, influxdb),
-    local crawlerDeployment = crawler.deployment,
 
     apiVersion: "v1",
     kind: "List",
     items: [
-        crawlerDeployment,
-        influxdbSecret,
-        influxdbService,
-        influxdbDeployment
+        crawler.deployment,
+        influxdb.secret,
+        influxdb.service,
+        influxdb.deployment
     ] + (
         if conf.app.persistentData.use then [
-            influxdbPersistentVolumes[x] for x in std.objectFields(influxdbPersistentVolumes)
+            influxdb.persistentVolumes[x] for x in std.objectFields(influxdb.persistentVolumes)
         ] + [
-            influxdbPersistentVolumeClaims[x] for x in std.objectFields(influxdbPersistentVolumeClaims)  
+            influxdb.persistentVolumeClaims[x] for x in std.objectFields(influxdb.persistentVolumeClaims)  
         ] else []
     ),
 };

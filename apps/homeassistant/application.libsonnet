@@ -117,6 +117,9 @@ local new(conf) = {
                 noderedComponentName,
                 "nodered/node-red-docker",
                 conf.app.nodered.imageTag,
+                env = [
+                    kube.containerEnvFromValue("TZ", "Europe/Berlin"),
+                ],
                 ports = [
                     kube.containerPort(1880),
                 ],

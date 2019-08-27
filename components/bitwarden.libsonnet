@@ -50,7 +50,7 @@ local new(namespace, namePrefix, labels, config) = {
     local secret = kube.secret(
         namespace, 
         namePrefix + "-" + componentName,
-        labels,
+        labels + {component: componentName},
         stringData = {
             ADMIN_TOKEN: config.app.adminToken,
         } + (

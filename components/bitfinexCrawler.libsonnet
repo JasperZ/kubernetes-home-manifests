@@ -19,7 +19,7 @@ local configuration = {
     },
 };
 
-local new(namespace, namePrefix, labels, influxdbComponent, config) = {
+local new(namespace, namePrefix, labels, config, influxdbComponent) = {
     local componentName = "bitfinex-crawler",
 
     local deployment = kube.deployment(

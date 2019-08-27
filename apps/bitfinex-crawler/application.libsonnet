@@ -49,7 +49,7 @@ local new(conf) = {
             tradingSymbols:: conf.app.crawler.tradingSymbols,
         },
     },
-    local crawler = bitfinexCrawlerComponent.new(namespace, name, labels, influxdb, crawlerConfig),
+    local crawler = bitfinexCrawlerComponent.new(namespace, name, labels, crawlerConfig, influxdb),
     local crawlerDeployment = crawler.deployment,
 
     apiVersion: "v1",

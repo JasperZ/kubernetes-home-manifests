@@ -109,12 +109,12 @@ local new(conf) = {
         homeassistantConfig,
         influxdbComponent = (
             if conf.app.influxdb.use then (
-            influxdb
+                influxdb
             )
         ),
         mariadbComponent = (
             if conf.app.mariadb.use then (
-            mariadb
+                mariadb
             )
         ),
     ),

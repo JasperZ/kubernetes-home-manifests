@@ -41,14 +41,14 @@ local new(namespace, namePrefix, labels, config) = {
         config: kube.persistentVolume(
             namePrefix + "-" + componentName + "-" + motioneyeConfigDir,
             labels + {component: componentName},
-            config.data.config.nfsServer,
-            config.data.config.nfsPath,
+            config.data.nfsVolumes.config.nfsServer,
+            config.data.nfsVolumes.config.nfsPath,
         ),
         media: kube.persistentVolume(
             namePrefix + "-" + componentName + "-" + motioneyeMediaDir,
             labels + {component: componentName},
-            config.data.media.nfsServer,
-            config.data.media.nfsPath,
+            config.data.nfsVolumes.media.nfsServer,
+            config.data.nfsVolumes.media.nfsPath,
         ),
     },
     
@@ -86,10 +86,10 @@ local new(namespace, namePrefix, labels, config) = {
                     ] else []
                 ),
                 resources = kube.resources(
-                    config.kube.nextcloud.resources.requests.cpu,
-                    config.kube.nextcloud.resources.requests.memory,
-                    config.kube.nextcloud.resources.limits.cpu,
-                    config.kube.nextcloud.resources.limits.memory,
+                    config.kube.resources.requests.cpu,
+                    config.kube.resources.requests.memory,
+                    config.kube.resources.limits.cpu,
+                    config.kube.resources.limits.memory,
                 ),
             ),
         ],
@@ -112,7 +112,7 @@ local new(namespace, namePrefix, labels, config) = {
     ) + {
         spec+: {
             type: "LoadBalancer", 
-            loadBalancerIP: conf.app.motioneye.ip,
+            loadBalancerIP: config.app.ip,
             externalTrafficPolicy: "Local",
         },
     },

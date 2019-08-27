@@ -66,7 +66,7 @@ local new(conf) = {
             domain:: conf.app.onlyoffice.domain,
         },
     },
-    local onlyoffice = onlyofficeComponent.new(namespace, name, labels, 80, onlyofficeConfig),
+    local onlyoffice = onlyofficeComponent.new(namespace, name, labels, onlyofficeConfig),
 
     // Nextcloud Component
     local nextcloudConfig = nextcloudComponent.configuration + {
@@ -106,12 +106,27 @@ local new(conf) = {
                 },
                 data:: {
                     nfsServer:: conf.app.persistentData.cheap.nfsServer,
-                    nfsPath:: conf.app.persistentData.cheap.nfsRootPath + "/redis/data",
+                    nfsPath:: conf.app.persistentData.cheap.nfsRootPath + "/nextcloud/data",
                 },
             },
         },
     },
-    local nextcloud = nextcloudComponent.new(namespace, name, labels, 80, nextcloudConfig),
+    local nextcloud = nextcloudComponent.new(
+        namespace,
+        name,
+        labels,
+        nextcloudConfig,
+        mariadbComponent = (
+            if conf.app.mariadb.use then (
+                mariadb
+            )
+        ),
+        redisComponent = (
+            if conf.app.redis.use then (
+                redis
+            )
+        ),
+    ),
 
     apiVersion: "v1",
     kind: "List",

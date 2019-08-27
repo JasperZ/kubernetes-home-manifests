@@ -67,6 +67,7 @@
         nodered:: {
             use:: error "mariadb.use is required",
             imageTag:: error "homeassistant.imageTag is required",
+            ip:: error "homeassistant.ip is required",
         },
         influxdb:: {
             use:: error "mariadb.use is required",

@@ -24,13 +24,13 @@ local configuration = {
     },
 };
 
-local new(namespace, namePrefix, labels, servicePort, config) = {
+local new(namespace, namePrefix, labels, config) = {
     local componentName = "onlyoffice",
 
     local secret = kube.secret(
         namespace, 
         namePrefix + "-" + componentName,
-        labels,
+        labels + {component: componentName},
         stringData =  {
             JWT_SECRET: config.app.jwtSecret,
         },

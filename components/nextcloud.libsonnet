@@ -61,7 +61,7 @@ local configuration = {
     },
 };
 
-local new(namespace, namePrefix, labels, servicePort, config, mariadbComponent=null, redisComponent=null) = {
+local new(namespace, namePrefix, labels, config, mariadbComponent=null, redisComponent=null) = {
     local componentName = "nextcloud",
     local htmlDir = "html",
     local customAppsDir = "custom-apps",
@@ -210,7 +210,7 @@ local new(namespace, namePrefix, labels, servicePort, config, mariadbComponent=n
             ] else []
         ) + (
             if redisComponent != null then [
-                mariadbComponent.initContainer,
+                redisComponent.initContainer,
             ] else []
         ),
         volumes = [
@@ -288,7 +288,7 @@ local new(namespace, namePrefix, labels, servicePort, config, mariadbComponent=n
         labels + {component: componentName},
         deployment.metadata.labels,
         [
-            kube.servicePort("http", "TCP", servicePort, 80),
+            kube.servicePort("http", "TCP", 80, 80),
         ],
     ),
     
@@ -323,6 +323,8 @@ local new(namespace, namePrefix, labels, servicePort, config, mariadbComponent=n
 
     secret: secret,
     nginxConfigMap: nginxConfigMap,
+    persistentVolumes: persistentVolumes,
+    persistentVolumeClaims: persistentVolumeClaims,
     service: service,
     deployment: deployment,
     cronJob: cronJob,

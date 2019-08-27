@@ -6,11 +6,11 @@ local configuration = {
         resources:: {
             requests:: {
                 cpu:: "250m",
-                memory:: "128Mi",
+                memory:: "25Mi",
             },
             limits:: {
                 cpu:: "500m",
-                memory:: "512Mi",
+                memory:: "35Mi",
             },
         },
     },

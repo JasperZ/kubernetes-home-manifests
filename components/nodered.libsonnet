@@ -33,7 +33,7 @@ local configuration = {
     },
 };
 
-local new(namespace, namePrefix, labels, servicePort, config) = {
+local new(namespace, namePrefix, labels, config) = {
     local componentName = "nodered",
     local dataDir = "data",
     

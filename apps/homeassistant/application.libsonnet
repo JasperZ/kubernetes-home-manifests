@@ -34,7 +34,7 @@ local new(conf) = {
             },
         },
     },
-    local influxdb = influxdbComponent.new(namespace, name, labels, 8086, influxdbConfig),
+    local influxdb = influxdbComponent.new(namespace, name, labels, influxdbConfig),
 
     // mariadb Component
     local mariadbConfig = mariadbComponent.configuration + {
@@ -58,7 +58,7 @@ local new(conf) = {
             },
         },
     },
-    local mariadb = mariadbComponent.new(namespace, name, labels, 3306, mariadbConfig),
+    local mariadb = mariadbComponent.new(namespace, name, labels, mariadbConfig),
 
     // nodered Component
     local noderedConfig = noderedComponent.configuration + {
@@ -80,7 +80,7 @@ local new(conf) = {
             },
         },
     },
-    local nodered = noderedComponent.new(namespace, name, labels, 80, noderedConfig),
+    local nodered = noderedComponent.new(namespace, name, labels, noderedConfig),
 
     // homeassistant Component
     local homeassistantConfig = homeassistantComponent.configuration + {

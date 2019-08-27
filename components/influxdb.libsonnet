@@ -34,7 +34,7 @@ local configuration = {
     },
 };
 
-local new(namespace, namePrefix, labels, servicePort, config) = {
+local new(namespace, namePrefix, labels, config) = {
     local componentName = "influxdb",
     local dataDir = "data",
 
@@ -119,7 +119,7 @@ local new(namespace, namePrefix, labels, servicePort, config) = {
         labels + {component: componentName},
         deployment.metadata.labels,
         [
-            kube.servicePort("http", "TCP", servicePort, 8086),
+            kube.servicePort("http", "TCP", 8086, 8086),
         ],
     ),
 
@@ -132,7 +132,7 @@ local new(namespace, namePrefix, labels, servicePort, config) = {
             "-c",
             "until curl -sL -I %(service)s:%(port)s/ping; do echo waiting for %(service)s; sleep 2; done;" % {
                 service: service.metadata.name,
-                port: servicePort,
+                port: 8086,
             },
         ],
     ),

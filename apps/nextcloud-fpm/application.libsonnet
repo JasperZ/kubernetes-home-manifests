@@ -31,7 +31,7 @@ local new(conf) = {
             },
         },
     },
-    local mariadb = mariadbComponent.new(namespace, name, labels, 3306, mariadbConfig),
+    local mariadb = mariadbComponent.new(namespace, name, labels, mariadbConfig),
 
     // Redis Component
     local redisConfig = redisComponent.configuration + {
@@ -49,7 +49,7 @@ local new(conf) = {
             },
         },
     },
-    local redis = redisComponent.new(namespace, name, labels, 6379, redisConfig),
+    local redis = redisComponent.new(namespace, name, labels, redisConfig),
 
     // Onlyoffice Component
     local onlyofficeConfig = onlyofficeComponent.configuration + {

@@ -31,7 +31,7 @@ local configuration = {
     },
 };
 
-local new(namespace, namePrefix, labels, servicePort, config) = {
+local new(namespace, namePrefix, labels, config) = {
     local componentName = "mariadb",
     local dataDir = "data",
 
@@ -109,7 +109,7 @@ local new(namespace, namePrefix, labels, servicePort, config) = {
         labels + {component: componentName},
         deployment.metadata.labels,
         [
-            kube.servicePort("mysql", "TCP", servicePort, 3306),
+            kube.servicePort("mysql", "TCP", 3306, 3306),
         ],
     ),
 

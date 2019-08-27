@@ -21,7 +21,7 @@ local new(conf) = {
             },
         },
     },
-    local ddclient = ddclientComponent.new(namespace, name, labels, 8086, ddclientConfig),
+    local ddclient = ddclientComponent.new(namespace, name, labels, ddclientConfig),
 
     apiVersion: "v1",
     kind: "List",

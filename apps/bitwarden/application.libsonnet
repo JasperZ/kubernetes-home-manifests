@@ -1,5 +1,5 @@
 local kube = import "../../templates/kubernetes.libsonnet";
-local bitwardenComponent = import "../../components/bitwarden.libsonnet";
+local bitwardenComponent = import "../../components/bitwarden/bitwarden.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,

@@ -1,5 +1,5 @@
 local kube = import "../../templates/kubernetes.libsonnet";
-local ddclientComponent = import "../../components/ddclient.libsonnet";
+local ddclientComponent = import "../../components/ddclient/ddclient.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,

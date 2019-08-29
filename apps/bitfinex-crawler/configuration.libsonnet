@@ -1,5 +1,5 @@
-local crawlerComponent = import "../../components/bitfinexCrawler.libsonnet";
-local influxdbComponent = import "../../components/influxdb.libsonnet";
+local crawlerComponent = import "../../components/bitfinexCrawler/bitfinexCrawler.libsonnet";
+local influxdbComponent = import "../../components/influxdb/influxdb.libsonnet";
 
 {
     kubernetes:: {

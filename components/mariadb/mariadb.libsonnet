@@ -1,18 +1,24 @@
-local kube = import "../templates/kubernetes.libsonnet";
+local kube = import "../../templates/kubernetes.libsonnet";
 
 local configuration = {
     kube:: {
         imageTag:: error "kube.imageTag is required",
         resources:: {
             requests:: {
-                cpu:: "50m",
-                memory:: "50Mi",
-            },
-            limits:: {
                 cpu:: "100m",
                 memory:: "100Mi",
             },
+            limits:: {
+                cpu:: "200m",
+                memory:: "150Mi",
+            },
         },
+    },
+    app:: {
+        rootPassword:: error "app.rootPassword is required",
+        user:: error "app.user is required",
+        userPassword:: error "app.userPassword is required",
+        database:: error "app.database is required",
     },
     data:: {
         persist:: error "data.persist is required",
@@ -26,8 +32,20 @@ local configuration = {
 };
 
 local new(namespace, namePrefix, labels, config) = {
-    local componentName = "redis",
+    local componentName = "mariadb",
     local dataDir = "data",
+
+    local secret = kube.secret(
+        namespace,
+        namePrefix + "-" + componentName,
+        labels + {component: componentName},
+        stringData = {
+            MYSQL_ROOT_PASSWORD: config.app.rootPassword,
+            MYSQL_USER: config.app.user,
+            MYSQL_PASSWORD: config.app.userPassword,
+            MYSQL_DATABASE: config.app.database,
+        },
+    ),
 
     local persistentVolumes = {
         data: kube.persistentVolume(
@@ -46,7 +64,7 @@ local new(namespace, namePrefix, labels, config) = {
             persistentVolumes.data.metadata.name,
         ),
     },
-    
+
     local deployment = kube.deployment(
         namespace,
         namePrefix + "-" + componentName,
@@ -54,14 +72,20 @@ local new(namespace, namePrefix, labels, config) = {
         [
             kube.deploymentContainer(
                 componentName,
-                "redis",
+                "mariadb",
                 config.kube.imageTag,
+                env = [
+                    kube.containerEnvFromSecret("MYSQL_ROOT_PASSWORD", secret.metadata.name, "MYSQL_ROOT_PASSWORD"),
+                    kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
+                    kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
+                    kube.containerEnvFromSecret("MYSQL_DATABASE", secret.metadata.name, "MYSQL_DATABASE"),
+                ],
                 ports = [
-                    kube.containerPort(6379),
+                    kube.containerPort(3306),
                 ],
                 volumeMounts = (
                     if config.data.persist then [
-                        kube.containerVolumeMount(dataDir, "/data"),
+                        kube.containerVolumeMount(dataDir, "/var/lib/mysql"),
                     ] else []
                 ),
                 resources = kube.resources(
@@ -85,21 +109,26 @@ local new(namespace, namePrefix, labels, config) = {
         labels + {component: componentName},
         deployment.metadata.labels,
         [
-            kube.servicePort("redis", "TCP", 6379, 6379),
+            kube.servicePort("mysql", "TCP", 3306, 3306),
         ],
     ),
 
     local initContainer = kube.deploymentContainer(
-        "init-redis",
-        "redis",
+        "init-mariadb",
+        "mariadb",
         config.kube.imageTag,
         command = [
             "sh",
             "-c",
-            "until redis-cli -h %(service)s -p 6379 ping; do echo waiting for %(service)s; sleep 2; done;" % {service: service.metadata.name},
+            "until mysql -h %(service)s -u $MYSQL_USER --password=$MYSQL_PASSWORD -e 'SELECT 1'; do echo waiting for %(service)s; sleep 2; done;" % {service: service.metadata.name},
+        ],
+        env = [
+            kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
+            kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
         ],
     ),
 
+    secret: secret,
     persistentVolumes: persistentVolumes,
     persistentVolumeClaims: persistentVolumeClaims,
     service: service,

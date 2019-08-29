@@ -1,5 +1,5 @@
 local kube = import "../../templates/kubernetes.libsonnet";
-local motioneyeComponent = import "../../components/motioneye.libsonnet";
+local motioneyeComponent = import "../../components/motioneye/motioneye.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,

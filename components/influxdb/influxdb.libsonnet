@@ -1,4 +1,4 @@
-local kube = import "../templates/kubernetes.libsonnet";
+local kube = import "../../templates/kubernetes.libsonnet";
 
 local configuration = {
     kube:: {

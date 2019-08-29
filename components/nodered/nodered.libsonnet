@@ -1,24 +1,26 @@
-local kube = import "../templates/kubernetes.libsonnet";
+local kube = import "../../templates/kubernetes.libsonnet";
 
 local configuration = {
     kube:: {
         imageTag:: error "kube.imageTag is required",
         resources:: {
             requests:: {
-                cpu:: "100m",
-                memory:: "100Mi",
+                cpu:: "50m",
+                memory:: "80Mi",
             },
             limits:: {
-                cpu:: "200m",
+                cpu:: "80m",
                 memory:: "150Mi",
             },
         },
+        certificateIssuer:: {
+            name:: error "kube.certificateIssuer.name is required",
+            kind:: error "kube.certificateIssuer.kind is required",
+        },
     },
     app:: {
-        rootPassword:: error "app.rootPassword is required",
-        user:: error "app.user is required",
-        userPassword:: error "app.userPassword is required",
-        database:: error "app.database is required",
+        timezone:: error "app.timezone is required",
+        ip:: error "app.ip is required",
     },
     data:: {
         persist:: error "data.persist is required",
@@ -32,21 +34,9 @@ local configuration = {
 };
 
 local new(namespace, namePrefix, labels, config) = {
-    local componentName = "mariadb",
+    local componentName = "nodered",
     local dataDir = "data",
-
-    local secret = kube.secret(
-        namespace,
-        namePrefix + "-" + componentName,
-        labels + {component: componentName},
-        stringData = {
-            MYSQL_ROOT_PASSWORD: config.app.rootPassword,
-            MYSQL_USER: config.app.user,
-            MYSQL_PASSWORD: config.app.userPassword,
-            MYSQL_DATABASE: config.app.database,
-        },
-    ),
-
+    
     local persistentVolumes = {
         data: kube.persistentVolume(
             namePrefix + "-" + componentName + "-" + dataDir,
@@ -55,7 +45,7 @@ local new(namespace, namePrefix, labels, config) = {
             config.data.nfsVolumes.data.nfsPath,
         ),
     },
-
+    
     local persistentVolumeClaims = {
         data: kube.persistentVolumeClaim(
             namespace,
@@ -64,7 +54,7 @@ local new(namespace, namePrefix, labels, config) = {
             persistentVolumes.data.metadata.name,
         ),
     },
-
+    
     local deployment = kube.deployment(
         namespace,
         namePrefix + "-" + componentName,
@@ -72,20 +62,17 @@ local new(namespace, namePrefix, labels, config) = {
         [
             kube.deploymentContainer(
                 componentName,
-                "mariadb",
+                "nodered/node-red-docker",
                 config.kube.imageTag,
                 env = [
-                    kube.containerEnvFromSecret("MYSQL_ROOT_PASSWORD", secret.metadata.name, "MYSQL_ROOT_PASSWORD"),
-                    kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
-                    kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
-                    kube.containerEnvFromSecret("MYSQL_DATABASE", secret.metadata.name, "MYSQL_DATABASE"),
+                    kube.containerEnvFromValue("TZ", config.app.timezone),
                 ],
                 ports = [
-                    kube.containerPort(3306),
+                    kube.containerPort(1880),
                 ],
                 volumeMounts = (
                     if config.data.persist then [
-                        kube.containerVolumeMount(dataDir, "/var/lib/mysql"),
+                        kube.containerVolumeMount(dataDir, "/data"),
                     ] else []
                 ),
                 resources = kube.resources(
@@ -109,31 +96,20 @@ local new(namespace, namePrefix, labels, config) = {
         labels + {component: componentName},
         deployment.metadata.labels,
         [
-            kube.servicePort("mysql", "TCP", 3306, 3306),
+            kube.servicePort("http", "TCP", 80, 1880),
         ],
-    ),
+    ) + {
+        spec+: {
+            type: "LoadBalancer", 
+            loadBalancerIP: config.app.ip,
+            externalTrafficPolicy: "Local",
+        },
+    },
 
-    local initContainer = kube.deploymentContainer(
-        "init-mariadb",
-        "mariadb",
-        config.kube.imageTag,
-        command = [
-            "sh",
-            "-c",
-            "until mysql -h %(service)s -u $MYSQL_USER --password=$MYSQL_PASSWORD -e 'SELECT 1'; do echo waiting for %(service)s; sleep 2; done;" % {service: service.metadata.name},
-        ],
-        env = [
-            kube.containerEnvFromSecret("MYSQL_USER", secret.metadata.name, "MYSQL_USER"),
-            kube.containerEnvFromSecret("MYSQL_PASSWORD", secret.metadata.name, "MYSQL_PASSWORD"),
-        ],
-    ),
-
-    secret: secret,
     persistentVolumes: persistentVolumes,
     persistentVolumeClaims: persistentVolumeClaims,
     service: service,
     deployment: deployment,
-    initContainer: initContainer,
 };
 
 {

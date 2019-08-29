@@ -1,4 +1,4 @@
-local ddclientComponent = import "../../components/ddclient.libsonnet";
+local ddclientComponent = import "../../components/ddclient/ddclient.libsonnet";
 
 {
     kubernetes:: {

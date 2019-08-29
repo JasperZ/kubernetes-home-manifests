@@ -1,60 +1,72 @@
-local kube = import "../templates/kubernetes.libsonnet";
+local kube = import "../../templates/kubernetes.libsonnet";
 
 local configuration = {
     kube:: {
         imageTag:: error "kube.imageTag is required",
         resources:: {
             requests:: {
-                cpu:: "50m",
-                memory:: "80Mi",
+                cpu:: "200m",
+                memory:: "200Mi",
             },
             limits:: {
-                cpu:: "80m",
-                memory:: "150Mi",
+                cpu:: "400m",
+                memory:: "350Mi",
             },
-        },
-        certificateIssuer:: {
-            name:: error "kube.certificateIssuer.name is required",
-            kind:: error "kube.certificateIssuer.kind is required",
         },
     },
     app:: {
-        timezone:: error "app.timezone is required",
         ip:: error "app.ip is required",
     },
     data:: {
         persist:: error "data.persist is required",
         nfsVolumes:: {
-            data:: {
-                nfsServer:: error "data.nfsVolumes.data.nfsServer is required",
-                nfsPath:: error "data.nfsVolumes.data.nfsPath is required",
+            config:: {
+                nfsServer:: error "config.nfsVolumes.config.nfsServer is required",
+                nfsPath:: error "config.nfsVolumes.config.nfsPath is required",
+            },
+            media:: {
+                nfsServer:: error "data.nfsVolumes.media.nfsServer is required",
+                nfsPath:: error "data.nfsVolumes.media.nfsPath is required",
             },
         },
     },
 };
 
 local new(namespace, namePrefix, labels, config) = {
-    local componentName = "nodered",
-    local dataDir = "data",
+    local componentName = "motioneye",
+    local motioneyeConfigDir = "config",
+    local motioneyeMediaDir = "media",
     
     local persistentVolumes = {
-        data: kube.persistentVolume(
-            namePrefix + "-" + componentName + "-" + dataDir,
+        config: kube.persistentVolume(
+            namePrefix + "-" + componentName + "-" + motioneyeConfigDir,
             labels + {component: componentName},
-            config.data.nfsVolumes.data.nfsServer,
-            config.data.nfsVolumes.data.nfsPath,
+            config.data.nfsVolumes.config.nfsServer,
+            config.data.nfsVolumes.config.nfsPath,
+        ),
+        media: kube.persistentVolume(
+            namePrefix + "-" + componentName + "-" + motioneyeMediaDir,
+            labels + {component: componentName},
+            config.data.nfsVolumes.media.nfsServer,
+            config.data.nfsVolumes.media.nfsPath,
         ),
     },
     
     local persistentVolumeClaims = {
-        data: kube.persistentVolumeClaim(
+        config: kube.persistentVolumeClaim(
             namespace,
-            persistentVolumes.data.metadata.name,
+            persistentVolumes.config.metadata.name,
             labels + {component: componentName},
-            persistentVolumes.data.metadata.name,
+            persistentVolumes.config.metadata.name,
+        ),
+        media: kube.persistentVolumeClaim(
+            namespace,
+            persistentVolumes.media.metadata.name,
+            labels + {component: componentName},
+            persistentVolumes.media.metadata.name,
         ),
     },
-    
+
     local deployment = kube.deployment(
         namespace,
         namePrefix + "-" + componentName,
@@ -62,17 +74,15 @@ local new(namespace, namePrefix, labels, config) = {
         [
             kube.deploymentContainer(
                 componentName,
-                "nodered/node-red-docker",
+                "ccrisan/motioneye",
                 config.kube.imageTag,
-                env = [
-                    kube.containerEnvFromValue("TZ", config.app.timezone),
-                ],
                 ports = [
-                    kube.containerPort(1880),
+                    kube.containerPort(8765),
                 ],
                 volumeMounts = (
                     if config.data.persist then [
-                        kube.containerVolumeMount(dataDir, "/data"),
+                        kube.containerVolumeMount(motioneyeConfigDir, "/etc/motioneye"),
+                        kube.containerVolumeMount(motioneyeMediaDir, "/var/lib/motioneye"),
                     ] else []
                 ),
                 resources = kube.resources(
@@ -85,18 +95,19 @@ local new(namespace, namePrefix, labels, config) = {
         ],
         volumes = (
             if config.data.persist then [
-                kube.deploymentVolumePVC(dataDir, persistentVolumeClaims.data.metadata.name),
+                kube.deploymentVolumePVC(motioneyeConfigDir, persistentVolumeClaims.config.metadata.name),
+                kube.deploymentVolumePVC(motioneyeMediaDir, persistentVolumeClaims.media.metadata.name),
             ] else []
         ),
     ),
-
+    
     local service = kube.service(
         namespace,
         namePrefix + "-" + componentName,
         labels + {component: componentName},
         deployment.metadata.labels,
         [
-            kube.servicePort("http", "TCP", 80, 1880),
+            kube.servicePort("http", "TCP", 80, 8765),
         ],
     ) + {
         spec+: {

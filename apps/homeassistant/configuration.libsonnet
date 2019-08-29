@@ -1,7 +1,7 @@
-local influxdbComponent = import "../../components/influxdb.libsonnet";
-local mariadbComponent = import "../../components/mariadb.libsonnet";
-local noderedComponent = import "../../components/nodered.libsonnet";
-local homeassistantComponent = import "../../components/homeassistant.libsonnet";
+local influxdbComponent = import "../../components/influxdb/influxdb.libsonnet";
+local mariadbComponent = import "../../components/mariadb/mariadb.libsonnet";
+local noderedComponent = import "../../components/nodered/nodered.libsonnet";
+local homeassistantComponent = import "../../components/homeassistant/homeassistant.libsonnet";
 
 {
     kubernetes:: {

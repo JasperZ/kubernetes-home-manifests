@@ -1,7 +1,7 @@
-local nextcloudComponent = import "../../components/nextcloud.libsonnet";
-local mariadbComponent = import "../../components/mariadb.libsonnet";
-local redisComponent = import "../../components/redis.libsonnet";
-local onlyofficeComponent = import "../../components/onlyoffice.libsonnet";
+local nextcloudComponent = import "../../components/nextcloud/nextcloud.libsonnet";
+local mariadbComponent = import "../../components/mariadb/mariadb.libsonnet";
+local redisComponent = import "../../components/redis/redis.libsonnet";
+local onlyofficeComponent = import "../../components/onlyoffice/onlyoffice.libsonnet";
 
 {
     kubernetes:: {

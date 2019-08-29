@@ -1,6 +1,6 @@
 local kube = import "../../templates/kubernetes.libsonnet";
-local influxdbComponent = import "../../components/influxdb.libsonnet";
-local bitfinexCrawlerComponent = import "../../components/bitfinexCrawler.libsonnet";
+local influxdbComponent = import "../../components/influxdb/influxdb.libsonnet";
+local bitfinexCrawlerComponent = import "../../components/bitfinexCrawler/bitfinexCrawler.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,

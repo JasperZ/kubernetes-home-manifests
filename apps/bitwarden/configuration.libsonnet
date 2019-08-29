@@ -1,4 +1,4 @@
-local bitwardenComponent = import "../../components/bitwarden.libsonnet";
+local bitwardenComponent = import "../../components/bitwarden/bitwarden.libsonnet";
 
 {
     kubernetes:: {

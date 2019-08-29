@@ -1,4 +1,4 @@
-local urbackupComponent = import "../../components/urbackup.libsonnet";
+local urbackupComponent = import "../../components/urbackup/urbackup.libsonnet";
 
 {
     kubernetes:: {

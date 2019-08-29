@@ -1,4 +1,4 @@
-local motioneyeComponent = import "../../components/motioneye.libsonnet";
+local motioneyeComponent = import "../../components/motioneye/motioneye.libsonnet";
 
 {
     kubernetes:: {

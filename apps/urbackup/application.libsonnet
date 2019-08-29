@@ -1,5 +1,5 @@
 local kube = import "../../templates/kubernetes.libsonnet";
-local urbackupComponent = import "../../components/urbackup.libsonnet";
+local urbackupComponent = import "../../components/urbackup/urbackup.libsonnet";
 
 local new(conf) = {
     local namespace = conf.kube.namespace,

@@ -1,4 +1,4 @@
 secrets.yaml
 secrets
-overlays
+targets
 *.env

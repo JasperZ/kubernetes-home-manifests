@@ -12,7 +12,7 @@ local new(conf) = {
             imageTag:: conf.app.motioneye.imageTag,
             resources:: conf.kube.motioneye.resources,
         },
-        app+:: {
+        params+:: {
             ip:: conf.app.motioneye.ip,
         },
         data+:: {

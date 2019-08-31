@@ -18,7 +18,7 @@ local configuration = {
             kind:: error "kube.certificateIssuer.kind is required",
         },
     },
-    app:: {
+    params:: {
         adminToken:: error "bitwarden.adminToken is required",
         signupsAllowed:: error "bitwarden.signupsAllowed is required",
         domain:: error "bitwarden.domain is required",
@@ -52,15 +52,15 @@ local new(namespace, namePrefix, labels, config) = {
         namePrefix + "-" + componentName,
         labels + {component: componentName},
         stringData = {
-            ADMIN_TOKEN: config.app.adminToken,
+            ADMIN_TOKEN: config.params.adminToken,
         } + (
-            if config.app.smtp.use then {
-                SMTP_HOST: config.app.smtp.host,
-                SMTP_FROM: config.app.smtp.from,
-                SMTP_PORT: config.app.smtp.port,
-                SMTP_SSL: config.app.smtp.ssl,
-                SMTP_USERNAME: config.app.smtp.username,
-                SMTP_PASSWORD: config.app.smtp.password,
+            if config.params.smtp.use then {
+                SMTP_HOST: config.params.smtp.host,
+                SMTP_FROM: config.params.smtp.from,
+                SMTP_PORT: config.params.smtp.port,
+                SMTP_SSL: config.params.smtp.ssl,
+                SMTP_USERNAME: config.params.smtp.username,
+                SMTP_PASSWORD: config.params.smtp.password,
             } else {}
         ),
     ),
@@ -93,12 +93,12 @@ local new(namespace, namePrefix, labels, config) = {
                 "bitwardenrs/server",
                 config.kube.imageTag,
                 env = [
-                    kube.containerEnvFromValue("DOMAIN", "https://%s" % config.app.domain),
+                    kube.containerEnvFromValue("DOMAIN", "https://%s" % config.params.domain),
                     kube.containerEnvFromValue("WEBSOCKET_ENABLED", "true"),
-                    kube.containerEnvFromValue("SIGNUPS_ALLOWED", config.app.signupsAllowed),
+                    kube.containerEnvFromValue("SIGNUPS_ALLOWED", config.params.signupsAllowed),
                     kube.containerEnvFromSecret("ADMIN_TOKEN", secret.metadata.name, "ADMIN_TOKEN"),
                 ] + (
-                    if config.app.smtp.use then [
+                    if config.params.smtp.use then [
                         kube.containerEnvFromSecret("SMTP_HOST", secret.metadata.name, "SMTP_HOST"),
                         kube.containerEnvFromSecret("SMTP_FROM", secret.metadata.name, "SMTP_FROM"),
                         kube.containerEnvFromSecret("SMTP_PORT", secret.metadata.name, "SMTP_PORT"),
@@ -146,8 +146,8 @@ local new(namespace, namePrefix, labels, config) = {
         namespace,
         namePrefix + "-" + componentName,
         labels + {component: componentName},
-        "%(domain)s-tls" % {domain: std.strReplace(config.app.domain, ".", "-")},
-        config.app.domain,
+        "%(domain)s-tls" % {domain: std.strReplace(config.params.domain, ".", "-")},
+        config.params.domain,
         {metadata: config.kube.certificateIssuer},
     ),
     
@@ -157,13 +157,13 @@ local new(namespace, namePrefix, labels, config) = {
         labels + {component: componentName},
         tls = [
             kube.ingressTls(
-                [config.app.domain],
-                "%(domain)s-tls" % {domain: std.strReplace(config.app.domain, ".", "-")}
+                [config.params.domain],
+                "%(domain)s-tls" % {domain: std.strReplace(config.params.domain, ".", "-")}
             ),
         ],
         rules = [
             kube.ingressRule(
-                config.app.domain,
+                config.params.domain,
                 [
                     kube.ingressRulePath(service.metadata.name, 80, "/"),
                     kube.ingressRulePath(service.metadata.name, 80, "/notifications/hub/negotiate"),

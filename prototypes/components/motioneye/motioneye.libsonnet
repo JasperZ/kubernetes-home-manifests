@@ -14,8 +14,8 @@ local configuration = {
             },
         },
     },
-    app:: {
-        ip:: error "app.ip is required",
+    params:: {
+        ip:: error "params.ip is required",
     },
     data:: {
         persist:: error "data.persist is required",
@@ -112,7 +112,7 @@ local new(namespace, namePrefix, labels, config) = {
     ) + {
         spec+: {
             type: "LoadBalancer", 
-            loadBalancerIP: config.app.ip,
+            loadBalancerIP: config.params.ip,
             externalTrafficPolicy: "Local",
         },
     },

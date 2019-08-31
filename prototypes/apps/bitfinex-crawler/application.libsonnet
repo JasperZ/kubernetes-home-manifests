@@ -13,7 +13,7 @@ local new(conf) = {
             imageTag:: conf.app.influxdb.imageTag,
             resources:: conf.kube.influxdb.resources,
         },
-        app+:: {
+        params+:: {
             adminUser:: conf.app.influxdb.adminUser,
             adminUserPassword:: conf.app.influxdb.adminUserPassword,
             writeUser:: conf.app.influxdb.writeUser,
@@ -40,7 +40,7 @@ local new(conf) = {
             imageTag:: conf.app.crawler.imageTag,
             resources:: conf.kube.crawler.resources,
         },
-        app+:: {
+        params+:: {
             tradingSymbols:: conf.app.crawler.tradingSymbols,
         },
     },

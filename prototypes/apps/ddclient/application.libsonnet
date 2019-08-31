@@ -12,7 +12,7 @@ local new(conf) = {
             imageTag:: conf.app.ddclient.imageTag,
             resources:: conf.kube.ddclient.resources,
         },
-        app+:: {
+        params+:: {
             cloudflare+:: {
                 email:: conf.app.ddclient.cloudflare.email,
                 apiToken:: conf.app.ddclient.cloudflare.apiToken,

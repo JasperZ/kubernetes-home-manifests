@@ -18,8 +18,8 @@ local configuration = {
             kind:: error "kube.certificateIssuer.kind is required",
         },
     },
-    app:: {
-        domain:: error "app.domain is required",
+    params:: {
+        domain:: error "params.domain is required",
     },
     data:: {
         persist:: error "data.persist is required",
@@ -109,8 +109,8 @@ local new(namespace, namePrefix, labels, config, influxdbComponent=null, mariadb
         namespace,
         namePrefix + "-" + componentName,
         labels + {component: componentName},
-        "%(domain)s-tls" % {domain: std.strReplace(config.app.domain, ".", "-")},
-        config.app.domain,
+        "%(domain)s-tls" % {domain: std.strReplace(config.params.domain, ".", "-")},
+        config.params.domain,
         {metadata: config.kube.certificateIssuer},
     ),
 
@@ -120,13 +120,13 @@ local new(namespace, namePrefix, labels, config, influxdbComponent=null, mariadb
         labels + {component: componentName},
         tls = [
             kube.ingressTls(
-                [config.app.domain],
-                "%(domain)s-tls" % {domain: std.strReplace(config.app.domain, ".", "-")}
+                [config.params.domain],
+                "%(domain)s-tls" % {domain: std.strReplace(config.params.domain, ".", "-")}
             ),
         ],
         rules = [
             kube.ingressRule(
-                config.app.domain,
+                config.params.domain,
                 [
                     kube.ingressRulePath(service.metadata.name, 80),
                 ],

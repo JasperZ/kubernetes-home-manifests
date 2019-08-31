@@ -12,7 +12,7 @@ local new(conf) = {
             imageTag:: conf.app.urbackup.imageTag,
             resources:: conf.kube.urbackup.resources,
         },
-        app+:: {
+        params+:: {
             ip:: conf.app.urbackup.ip,
         },
         data+:: {

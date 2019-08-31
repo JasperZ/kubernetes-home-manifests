@@ -15,7 +15,7 @@ local new(conf) = {
             imageTag:: conf.app.mariadb.imageTag,
             resources:: conf.kube.mariadb.resources,
         },
-        app+:: {
+        params+:: {
             rootPassword:: conf.app.mariadb.rootPassword,
             user:: conf.app.mariadb.nextcloudUser,
             userPassword:: conf.app.mariadb.nextcloudUserPassword,
@@ -61,7 +61,7 @@ local new(conf) = {
                 kind:: conf.kube.certificateIssuer.kind,
             },
         },
-        app+:: {
+        params+:: {
             jwtSecret:: conf.app.onlyoffice.jwtSecret,
             domain:: conf.app.onlyoffice.domain,
         },
@@ -84,7 +84,7 @@ local new(conf) = {
                 kind:: conf.kube.certificateIssuer.kind,
             },
         },
-        app+:: {
+        params+:: {
             adminUser:: conf.app.nextcloud.adminUser,
             adminPassword:: conf.app.nextcloud.adminPassword,
             domain:: conf.app.nextcloud.domain,

@@ -18,9 +18,9 @@ local configuration = {
             kind:: error "kube.certificateIssuer.kind is required",
         },
     },
-    app:: {
-        timezone:: error "app.timezone is required",
-        ip:: error "app.ip is required",
+    params:: {
+        timezone:: error "params.timezone is required",
+        ip:: error "params.ip is required",
     },
     data:: {
         persist:: error "data.persist is required",
@@ -65,7 +65,7 @@ local new(namespace, namePrefix, labels, config) = {
                 "nodered/node-red-docker",
                 config.kube.imageTag,
                 env = [
-                    kube.containerEnvFromValue("TZ", config.app.timezone),
+                    kube.containerEnvFromValue("TZ", config.params.timezone),
                 ],
                 ports = [
                     kube.containerPort(1880),
@@ -101,7 +101,7 @@ local new(namespace, namePrefix, labels, config) = {
     ) + {
         spec+: {
             type: "LoadBalancer", 
-            loadBalancerIP: config.app.ip,
+            loadBalancerIP: config.params.ip,
             externalTrafficPolicy: "Local",
         },
     },

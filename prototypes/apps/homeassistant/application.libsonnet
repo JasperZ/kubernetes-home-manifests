@@ -15,7 +15,7 @@ local new(conf) = {
             imageTag:: conf.app.influxdb.imageTag,
             resources:: conf.kube.influxdb.resources,
         },
-        app+:: {
+        params+:: {
             adminUser:: conf.app.influxdb.adminUser,
             adminUserPassword:: conf.app.influxdb.adminUserPassword,
             writeUser:: conf.app.influxdb.writeUser,
@@ -42,7 +42,7 @@ local new(conf) = {
             imageTag:: conf.app.mariadb.imageTag,
             resources:: conf.kube.mariadb.resources,
         },
-        app+:: {
+        params+:: {
             rootPassword:: conf.app.mariadb.rootPassword,
             user:: conf.app.mariadb.homeassistantUser,
             userPassword:: conf.app.mariadb.homeassistantUserPassword,
@@ -66,7 +66,7 @@ local new(conf) = {
             imageTag:: conf.app.nodered.imageTag,
             resources:: conf.kube.nodered.resources,
         },
-        app+:: {
+        params+:: {
             timezone:: "Europe/Berlin",
             ip:: conf.app.nodered.ip,
         },
@@ -89,7 +89,7 @@ local new(conf) = {
             resources:: conf.kube.homeassistant.resources,
             certificateIssuer:: conf.kube.certificateIssuer,
         },
-        app+:: {
+        params+:: {
             domain:: conf.app.homeassistant.domain,
         },
         data+:: {

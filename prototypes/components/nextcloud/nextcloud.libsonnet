@@ -33,10 +33,10 @@ local configuration = {
             kind:: error "kube.certificateIssuer.kind is required",
         },
     },
-    app:: {
-        adminUser:: error "app.adminUser is required",
-        adminPassword:: error "app.adminPassword is required",
-        domain:: error "app.domain is required",
+    params:: {
+        adminUser:: error "params.adminUser is required",
+        adminPassword:: error "params.adminPassword is required",
+        domain:: error "params.domain is required",
     },
     data:: {
         persist:: error "data.persist is required",
@@ -73,8 +73,8 @@ local new(namespace, namePrefix, labels, config, mariadbComponent=null, redisCom
         namePrefix + "-" + componentName,
         labels,
         stringData = {
-            NEXTCLOUD_ADMIN_USER: config.app.adminUser,
-            NEXTCLOUD_ADMIN_PASSWORD: config.app.adminPassword,
+            NEXTCLOUD_ADMIN_USER: config.params.adminUser,
+            NEXTCLOUD_ADMIN_PASSWORD: config.params.adminPassword,
         }
     ),
     
@@ -153,7 +153,7 @@ local new(namespace, namePrefix, labels, config, mariadbComponent=null, redisCom
                 env = [
                     kube.containerEnvFromSecret("NEXTCLOUD_ADMIN_USER", secret.metadata.name, "NEXTCLOUD_ADMIN_USER"),
                     kube.containerEnvFromSecret("NEXTCLOUD_ADMIN_PASSWORD", secret.metadata.name, "NEXTCLOUD_ADMIN_PASSWORD"),
-                    kube.containerEnvFromValue("NEXTCLOUD_TRUSTED_DOMAINS", config.app.domain),
+                    kube.containerEnvFromValue("NEXTCLOUD_TRUSTED_DOMAINS", config.params.domain),
                 ] + (
                     if mariadbComponent != null then [
                         kube.containerEnvFromSecret("MYSQL_USER", mariadbComponent.secret.metadata.name, "MYSQL_USER"),
@@ -296,8 +296,8 @@ local new(namespace, namePrefix, labels, config, mariadbComponent=null, redisCom
         namespace,
         namePrefix + "-" + componentName,
         labels + {component: componentName},
-        "%(domain)s-tls" % {domain: std.strReplace(config.app.domain, ".", "-")},
-        config.app.domain,
+        "%(domain)s-tls" % {domain: std.strReplace(config.params.domain, ".", "-")},
+        config.params.domain,
         {metadata: config.kube.certificateIssuer},
     ),
 
@@ -307,13 +307,13 @@ local new(namespace, namePrefix, labels, config, mariadbComponent=null, redisCom
         labels + {component: componentName},
         tls = [
             kube.ingressTls(
-                [config.app.domain],
-                "%(domain)s-tls" % {domain: std.strReplace(config.app.domain, ".", "-")}
+                [config.params.domain],
+                "%(domain)s-tls" % {domain: std.strReplace(config.params.domain, ".", "-")}
             ),
         ],
         rules = [
             kube.ingressRule(
-                config.app.domain,
+                config.params.domain,
                 [
                     kube.ingressRulePath(service.metadata.name, 80),
                 ],

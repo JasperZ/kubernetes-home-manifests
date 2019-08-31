@@ -14,8 +14,8 @@ local configuration = {
             },
         },
     },
-    app:: {
-        tradingSymbols:: error "app.tradingSymbols is required",
+    params:: {
+        tradingSymbols:: error "params.tradingSymbols is required",
     },
 };
 
@@ -32,7 +32,7 @@ local new(namespace, namePrefix, labels, config, influxdbComponent) = {
                 "zdock/bitfinex-crawler",
                 config.kube.imageTag,
                 env = [
-                    kube.containerEnvFromValue("TICKER_SYMBOLS", config.app.tradingSymbols),
+                    kube.containerEnvFromValue("TICKER_SYMBOLS", config.params.tradingSymbols),
                     kube.containerEnvFromValue("INFLUXDB_HOST", influxdbComponent.service.metadata.name),
                     kube.containerEnvFromSecret("INFLUXDB_DATABASE", influxdbComponent.secret.metadata.name, "INFLUXDB_DB"),
                     kube.containerEnvFromSecret("INFLUXDB_USERNAME", influxdbComponent.secret.metadata.name, "INFLUXDB_WRITE_USER"),

@@ -14,11 +14,11 @@ local configuration = {
             },
         },
     },
-    app:: {
-        rootPassword:: error "app.rootPassword is required",
-        user:: error "app.user is required",
-        userPassword:: error "app.userPassword is required",
-        database:: error "app.database is required",
+    params:: {
+        rootPassword:: error "params.rootPassword is required",
+        user:: error "params.user is required",
+        userPassword:: error "params.userPassword is required",
+        database:: error "params.database is required",
     },
     data:: {
         persist:: error "data.persist is required",
@@ -40,10 +40,10 @@ local new(namespace, namePrefix, labels, config) = {
         namePrefix + "-" + componentName,
         labels + {component: componentName},
         stringData = {
-            MYSQL_ROOT_PASSWORD: config.app.rootPassword,
-            MYSQL_USER: config.app.user,
-            MYSQL_PASSWORD: config.app.userPassword,
-            MYSQL_DATABASE: config.app.database,
+            MYSQL_ROOT_PASSWORD: config.params.rootPassword,
+            MYSQL_USER: config.params.user,
+            MYSQL_PASSWORD: config.params.userPassword,
+            MYSQL_DATABASE: config.params.database,
         },
     ),
 

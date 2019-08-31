@@ -14,12 +14,12 @@ local configuration = {
             },
         },
     },
-    app:: {
+    params:: {
         cloudflare:: {
-            email:: error "app.cloudflare.email is required",
-            apiToken:: error "app.cloudflare.apiToken is required",
-            zone:: error "app.cloudflare.zone is required",
-            domains:: error "app.cloudflare.domains is required",
+            email:: error "params.cloudflare.email is required",
+            apiToken:: error "params.cloudflare.apiToken is required",
+            zone:: error "params.cloudflare.zone is required",
+            domains:: error "params.cloudflare.domains is required",
         },
     },
 };
@@ -48,10 +48,10 @@ local new(namespace, namePrefix, labels, config) = {
                 password=%(password)s \
                 %(domains)s
             ||| % {
-                zone: config.app.cloudflare.zone,
-                email: config.app.cloudflare.email,
-                password: config.app.cloudflare.apiToken,
-                domains: std.join(",", config.app.cloudflare.domains),
+                zone: config.params.cloudflare.zone,
+                email: config.params.cloudflare.email,
+                password: config.params.cloudflare.apiToken,
+                domains: std.join(",", config.params.cloudflare.domains),
             },
 
         },

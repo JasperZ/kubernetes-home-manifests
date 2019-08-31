@@ -16,7 +16,7 @@ local new(conf) = {
                 kind:: conf.kube.certificateIssuer.kind,
             },
         },
-        app+:: {
+        params+:: {
             adminToken:: conf.app.bitwarden.adminToken,
             signupsAllowed:: conf.app.bitwarden.signupsAllowed,
             domain:: conf.app.bitwarden.domain,

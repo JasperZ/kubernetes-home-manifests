@@ -18,9 +18,9 @@ local configuration = {
             kind:: error "kube.certificateIssuer.kind is required",
         },
     },
-    app:: {
-        jwtSecret:: error "app.jwtSecret is required",
-        domain:: error "app.domain is required",
+    params:: {
+        jwtSecret:: error "params.jwtSecret is required",
+        domain:: error "params.domain is required",
     },
 };
 
@@ -32,7 +32,7 @@ local new(namespace, namePrefix, labels, config) = {
         namePrefix + "-" + componentName,
         labels + {component: componentName},
         stringData =  {
-            JWT_SECRET: config.app.jwtSecret,
+            JWT_SECRET: config.params.jwtSecret,
         },
     ),
 
@@ -76,8 +76,8 @@ local new(namespace, namePrefix, labels, config) = {
         namespace,
         namePrefix + "-" + componentName,
         labels + {component: componentName},
-        "%(domain)s-tls" % {domain: std.strReplace(config.app.domain, ".", "-")},
-        config.app.domain,
+        "%(domain)s-tls" % {domain: std.strReplace(config.params.domain, ".", "-")},
+        config.params.domain,
         {metadata: config.kube.certificateIssuer},
     ),
 
@@ -87,13 +87,13 @@ local new(namespace, namePrefix, labels, config) = {
         labels + {component: componentName},
         tls = [
             kube.ingressTls(
-                [config.app.domain],
-                "%(domain)s-tls" % {domain: std.strReplace(config.app.domain, ".", "-")}
+                [config.params.domain],
+                "%(domain)s-tls" % {domain: std.strReplace(config.params.domain, ".", "-")}
             ),
         ],
         rules = [
             kube.ingressRule(
-                config.app.domain,
+                config.params.domain,
                 [
                     kube.ingressRulePath(service.metadata.name, 80),
                 ],

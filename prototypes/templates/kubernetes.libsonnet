@@ -92,7 +92,9 @@ local secret(namespace, name, labels, stringData={}, encodedData={}) = {
     apiVersion: "v1",
     kind: "Secret",
     metadata: {
-        name: name,
+        local hash = std.substr(std.md5(std.toString([stringData, encodedData])), 0, 8),
+
+        name: name + "-" + hash,
         namespace: namespace,
         labels: labels,
     },
@@ -153,7 +155,9 @@ local configMap(namespace, name, labels, data) = {
     apiVersion: "v1",
     kind: "ConfigMap",
     metadata: {
-        name: name,
+        local hash = std.substr(std.md5(std.toString($.data)), 0, 8),
+
+        name: name + "-" + hash,
         namespace: namespace,
         labels: labels,
     },

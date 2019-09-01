@@ -167,6 +167,12 @@ local configMap(namespace, name, labels, data) = {
 local deploymentContainer(name, image, imageTag, command=[], env=[], ports=[], volumeMounts=[], resources={}) = {
     name: name,
     image: image + ":" + imageTag,
+    imagePullPolicy: (
+        if imageTag == "latest" then
+            "Always"
+        else
+            "IfNotPresent"
+    ),
     command: command,
     env: env,
     ports: ports,

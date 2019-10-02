@@ -269,7 +269,7 @@ local new(namespace, namePrefix, labels, config, mariadbComponent=null, redisCom
             ] else []
         ) + (
             if redisComponent != null then [
-                mariadbComponent.initContainer,
+                redisComponent.initContainer,
             ] else []
         ),
         volumes = (

@@ -234,7 +234,7 @@ local new(namespace, namePrefix, labels, config, mariadbComponent=null, redisCom
         namespace,
         namePrefix + "-" + componentName + "-cron",
         labels + {component: componentName},
-        "*/15 * * * *",
+        "*/05 * * * *",
         [
             kube.deploymentContainer(
                 componentName,

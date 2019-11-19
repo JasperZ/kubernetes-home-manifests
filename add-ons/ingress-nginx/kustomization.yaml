@@ -1,0 +1,6 @@
+resources:
+- resources/namespace.yaml
+- github.com/kubernetes/ingress-nginx//deploy/cloud-generic?ref=nginx-0.26.1
+- github.com/kubernetes/ingress-nginx//deploy/cluster-wide?ref=nginx-0.26.1
+patches:
+- patches/load_balancer.yaml

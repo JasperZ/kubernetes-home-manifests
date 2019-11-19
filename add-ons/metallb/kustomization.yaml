@@ -1,0 +1,9 @@
+resources:
+- github.com/danderson/metallb//manifests?ref=v0.8.3
+- resources/config_map.yaml
+# fix wrong image tag used by github manifest
+images:
+- name: metallb/controller
+  newTag: v0.8.3
+- name: metallb/speaker
+  newTag: v0.8.3

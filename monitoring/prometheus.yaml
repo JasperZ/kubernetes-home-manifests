@@ -21,11 +21,12 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
   mountOptions:
     - nfsvers=4
   nfs:
-    path: /datacenter_250gb/k8s/volumes/prometheus/prometheus/data
-    server: storage.zcc.x64.me
+    path: /superman/k8s/volumes/prometheus/prometheus/data
+    server: 192.168.43.11
 ---
 
 apiVersion: v1
@@ -40,6 +41,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: nfs
   volumeMode: Filesystem
   resources:
     requests:
@@ -361,7 +363,7 @@ spec:
   loadBalancerIP: 192.168.70.16
 ---
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus

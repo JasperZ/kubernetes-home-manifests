@@ -11,11 +11,12 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
   mountOptions:
-    - nfsvers=3
+    - nfsvers=4
   nfs:
-    path: /mnt/datacenter_250GB/k8s/volumes/dashboards/grafana
-    server: storage.zcc.x64.me
+    path: /superman/k8s/volumes/dashboards/grafana
+    server: 192.168.43.11
 ---
 
 apiVersion: v1
@@ -25,11 +26,21 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: nfs
   volumeMode: Filesystem
   resources:
     requests:
       storage: 5Gi
   volumeName: dashboards-grafana-pv
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dashboards.grafana
+type: Opaque
+data:
+  admin-password: TTJnaUJqTlRhQThXTk5RdGE5TFRGNkpV
 ---
 
 apiVersion: v1
@@ -74,7 +85,7 @@ spec:
           persistentVolumeClaim:
             claimName: dashboards-grafana-pvc
       containers:
-        - image: grafana/grafana:5.4.3
+        - image: grafana/grafana:6.7.2
           name: grafana
           env:
             - name: GF_SECURITY_ADMIN_PASSWORD

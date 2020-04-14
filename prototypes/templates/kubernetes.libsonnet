@@ -119,6 +119,7 @@ local persistentVolume(name, labels, nfsServer, nfsPath, nfsVersion=4) = {
             "ReadWriteMany"
         ],
         persistentVolumeReclaimPolicy: "Retain",
+        storageClassName: "nfs",
         mountOptions: [
             "nfsvers=" + nfsVersion
         ],
@@ -142,6 +143,7 @@ local persistentVolumeClaim(namespace, name, labels, volumeName) = {
         accessModes: [
             "ReadWriteMany"
         ],
+        storageClassName: "nfs",
         resources: {
             requests: {
                 storage: "5Gi",
